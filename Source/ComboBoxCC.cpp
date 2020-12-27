@@ -1,5 +1,4 @@
 
-
 #include <JuceHeader.h>
 #include "ComboBoxCC.h"
 
@@ -79,7 +78,7 @@ void ComboBoxCC::drumSamplerPath(File directoryFile)
     varComboBox.onChange = [&]()
     {
         if(varComboBox.getSelectedId() != 0)
-            audioProcessor.loadSampleComboBox(files[varComboBox.getSelectedId()-1], drumSamplerType);
+            audioProcessor.loadAFile(files[varComboBox.getSelectedId()-1], drumSamplerType, 2);
     };
     addAndMakeVisible(varComboBox);
     

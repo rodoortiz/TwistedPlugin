@@ -1,5 +1,4 @@
 
-
 #pragma once
 
 #include <JuceHeader.h>
@@ -18,12 +17,12 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
     
-    int drumSamplerType=0;
     void setDrumSamplerType(int varInt);
     void aSampleIsLoaded();
-    TextButton varTextButton { "" };
-
+    
 private:
+    int drumSamplerType=0;
+    TextButton varTextButton { "" };
     
     Twisted_pluginAudioProcessor& audioProcessor;
     

@@ -1,5 +1,4 @@
 
-
 #include <JuceHeader.h>
 #include "MidiKeyboard.h"
 

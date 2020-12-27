@@ -1,7 +1,6 @@
 
-
 #pragma once
-class ButtonLookAndFeel : public LookAndFeel_V4
+class ButtonLookAndFeelStart : public LookAndFeel_V4
 {
 public:
     Font getTextButtonFont (TextButton&, int) override
@@ -10,5 +9,15 @@ public:
     }
     
 private:
+};
 
+class ButtonLookAndFeelStop : public LookAndFeel_V4
+{
+public:
+    Font getTextButtonFont (TextButton&, int) override
+    {
+        return Font ("Webdings", "Regular", 10.0f);
+    }
+    
+private:
 };

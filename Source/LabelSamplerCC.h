@@ -1,5 +1,4 @@
 
-
 #pragma once
 
 #include <JuceHeader.h>
@@ -20,7 +19,6 @@ public:
     void resized() override;
 
 private:
-        
     void setDrumSampleLabelText (String string)  { drumSampleLabel.setText(string, dontSendNotification); }
     
     Label drumSampleLabel;

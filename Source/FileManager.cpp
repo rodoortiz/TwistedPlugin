@@ -1,5 +1,4 @@
 
-
 #include <JuceHeader.h>
 
 struct FileManager
@@ -16,7 +15,6 @@ struct FileManager
     {
         if (!file.exists())
             file.createDirectory();
-
         return file;
     };
 
@@ -52,4 +50,6 @@ struct FileManager
         if (folder == SamplesFolder::Percussion)
             return createDirectory(directory.getChildFile("Percussion"));
     };
+    
+  
 };

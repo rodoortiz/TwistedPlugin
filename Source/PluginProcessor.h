@@ -9,6 +9,8 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "CustomSynthCC.h"
+#include "DspProcessor.h"
 
 //==============================================================================
 /**
@@ -53,47 +55,71 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
     
-    void loadFileDragged(const String& path, int& varInt);
-    void loadSampleComboBox(const File& file, int& varInt);
+    void loadAFile(const File& file, int& varInt, int varSource);
     Synthesiser* mySynthSelected(int& varInt);
     AudioBuffer<float>* myAudioBuffer(int& varInt);
     void mySampleNameSelected(int& varInt, String& varString);
     void myAudioLoadedBy(int& varInt, int varInt2);
     void mySoloUpdate(int& varInt, bool varBool);
-    void myPlay(bool varBool);
+    bool myPlayheadAllowed(int& varInt);
+    void myPlay();
+    void myStop();
     int myGetNumSamplerSounds(int& varInt);
     int myGetAudioLoadedBy(int& varInt);
     void mySetAudioLoadedBy(int& varInt, int varInt2);
-    SamplerSound* mySamplerSound(int& varInt);
-    BigInteger myRange(int& varInt);
-    int myNote(int& varInt);
+    void mySoundToSynth(int& varInt);
+    std::atomic<int>& myGetPlayheadValue(int& varInt);
     
-    AudioBuffer<float> varAudioBuffer0, varAudioBuffer1, varAudioBuffer2, varAudioBuffer3, varAudioBuffer4;
-    int audio0LoadedBy = 0, audio1LoadedBy = 0, audio2LoadedBy = 0, audio3LoadedBy = 0, audio4LoadedBy = 0;
-    bool solo0, solo1=true, solo2=true, solo3=true, solo4=true, allSolosDisabled=true;
-    bool playButtonStarts, playButtonStops;
-    MidiMessage messageNote1, messageNote2, messageNote3, messageNote4;
-    std::atomic<int> mSampleCount { 0 };
-    std::atomic<bool> isNotePlayed { false };
-    
+    AudioBuffer<float> varAudioBuffer1, varAudioBuffer2, varAudioBuffer3, varAudioBuffer4;
+    bool resetPlayandStopButtons;
+
     //MidiKeyboard
     MidiKeyboardState keyboardState;
+    //AudioProcessorValueTreeState and listener
+    AudioProcessorValueTreeState apvts;
+    //DSP
+    SynthProcessor reverbSnr, reverbHH, reverbPercs, bassBoost;
+    MasterOutputProcessor outputEffects;
     
-    SamplerSound* samplerSound1 {nullptr};
-    SamplerSound* samplerSound2 {nullptr};
-    SamplerSound* samplerSound3 {nullptr};
-    SamplerSound* samplerSound4 {nullptr};
 private:
-    int currentSynth = 0;
-    BigInteger range1, range2, range3, range4;
+    //Sample source indicators
+    int audio1LoadedBy = 0, audio2LoadedBy = 0, audio3LoadedBy = 0, audio4LoadedBy = 0;
+    //Play allowed indicators
+    bool playAllowed1=true, playAllowed2=true, playAllowed3=true, playAllowed4=true;
+    //All solos disabled indicator
+    bool allSolosDisabled=true;
+    //Play and Stop controls
+    bool playButtonStarts, stopButtonStarts;
+    //Synthesisers ranges and notes
     int C5note=84, D5note=86, E5note=88, F5note=89;
+    BigInteger range1, range2, range3, range4;
+    //Default Gain
+    float defaultGain = 0.75f;
     
-    Synthesiser varSynthesiser0, varSynthesiser1, varSynthesiser2, varSynthesiser3, varSynthesiser4;
-    const int numVoices {3};
+    std::atomic<int> playheadValue1 { 0 };
+    std::atomic<int> playheadValue2 { 0 };
+    std::atomic<int> playheadValue3 { 0 };
+    std::atomic<int> playheadValue4 { 0 };
+    std::atomic<bool> isNotePlayed1 { false };
+    std::atomic<bool> isNotePlayed2 { false };
+    std::atomic<bool> isNotePlayed3 { false };
+    std::atomic<bool> isNotePlayed4 { false };
     
-        
+    CustomSamplerSound* customSamplerSound1 {nullptr};
+    CustomSamplerSound* customSamplerSound2 {nullptr};
+    CustomSamplerSound* customSamplerSound3 {nullptr};
+    CustomSamplerSound* customSamplerSound4 {nullptr};
+    
+    CustomSamplerVoice* voiceSynth1 {nullptr};
+    CustomSamplerVoice* voiceSynth2 {nullptr};
+    CustomSamplerVoice* voiceSynth3 {nullptr};
+    CustomSamplerVoice* voiceSynth4 {nullptr};
+    
+    Synthesiser varSynthesiser1, varSynthesiser2, varSynthesiser3, varSynthesiser4;
     AudioFormatManager varFormatManager;
     AudioFormatReader* varFormatReader {nullptr};
+    
+    AudioProcessorValueTreeState::ParameterLayout paramLayout();
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Twisted_pluginAudioProcessor)
 };

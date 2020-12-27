@@ -16,7 +16,10 @@
 #include "ButtonSoloCC.h"
 #include "MidiKeyboard.h"
 #include "ButtonPlayCC.h"
+#include "ButtonStopCC.h"
 #include <array>
+#include "ReverbAndBoostSlider.h"
+#include "MasterSliders.h"
 
 //==============================================================================
 /**
@@ -33,15 +36,22 @@ public:
     void resized() override;
     
     void timerCallback() override;
-    
+        
 private:
-    Image imagen;
-    ImageComponent imagenComponent;
+    Image imagen, logo;
+    ImageComponent imagenComponent, logoComponent;
     
     std::vector<std::unique_ptr<WaveFormCC>> waveForms;
     std::vector<std::unique_ptr<ComboBoxCC>> comboBoxes;
     std::vector<std::unique_ptr<LabelSamplerCC>> labelSamplers;
     std::vector<std::unique_ptr<ButtonSoloCC>> buttonSolos;
+    std::vector<std::unique_ptr<ReverbAndBoostSlider>> sliders;
+    MasterSliders masterSliders;
+    
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> boostAttachment;
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> reverbSnrAttachment;
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> reverbHHAttachment;
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> reverbPercsAttachment;
     
     float yPosPlus = 0.15f;
     
@@ -49,12 +59,15 @@ private:
     float labelSamplerXpos = 0.325f;
     float buttonSoloXpos = 0.425f;
     float comboBoxXpos = 0.4625f;
+    float reverbSliderXpos = 0.68f;
+    float masterSlidersXpos = 0.74f;
 
-    Twisted_pluginAudioProcessor& audioProcessor;
+    ButtonPlayCC buttonPlayCC;
+    ButtonStopCC buttonStopCC;
     
     MidiKeyboard keyboardComponent;
     
-    ButtonPlayCC buttonPlayCC;
-
+    Twisted_pluginAudioProcessor& audioProcessor;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Twisted_pluginAudioProcessorEditor)
 };

@@ -19,19 +19,15 @@ Twisted_pluginAudioProcessor::Twisted_pluginAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ), apvts(*this, nullptr, "Parameters", paramLayout()), outputEffects(apvts)
 #endif
 {
     varFormatManager.registerBasicFormats();
     
-    for(int i = 0; i < numVoices; i++)
-    {
-        varSynthesiser0.addVoice(new SamplerVoice());
-        varSynthesiser1.addVoice(new SamplerVoice());
-        varSynthesiser2.addVoice(new SamplerVoice());
-        varSynthesiser3.addVoice(new SamplerVoice());
-        varSynthesiser4.addVoice(new SamplerVoice());
-    }
+    varSynthesiser1.addVoice(new CustomSamplerVoice());
+    varSynthesiser2.addVoice(new CustomSamplerVoice());
+    varSynthesiser3.addVoice(new CustomSamplerVoice());
+    varSynthesiser4.addVoice(new CustomSamplerVoice());
     
     //ranges initializer
     range1.setBit(C5note);
@@ -42,11 +38,32 @@ Twisted_pluginAudioProcessor::Twisted_pluginAudioProcessor()
     range3.setBit(E5note-12);
     range4.setBit(F5note);
     range4.setBit(F5note-12);
+    
+    //Get Voice of each synthesiser, each one has one voice
+    voiceSynth1 = static_cast<CustomSamplerVoice*>(varSynthesiser1.getVoice(0));
+    voiceSynth2 = static_cast<CustomSamplerVoice*>(varSynthesiser2.getVoice(0));
+    voiceSynth3 = static_cast<CustomSamplerVoice*>(varSynthesiser3.getVoice(0));
+    voiceSynth4 = static_cast<CustomSamplerVoice*>(varSynthesiser4.getVoice(0));
 }
 
 Twisted_pluginAudioProcessor::~Twisted_pluginAudioProcessor()
 {
     varFormatReader = nullptr;
+}
+
+//Creating parameters layout
+AudioProcessorValueTreeState::ParameterLayout Twisted_pluginAudioProcessor::paramLayout() {
+    std::vector<std::unique_ptr<RangedAudioParameter>> params;
+    params.push_back(std::make_unique<AudioParameterFloat>("BOOST", "boost", NormalisableRange<float>(49.0f, 160.0f, 1.0f), 49.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("REVERB_SNR", "reverbSnr", NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("REVERB_HH", "reverbHh", NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("REVERB_PERCS", "reverbPercs", NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("LOW_EQ", "lowEQ", NormalisableRange<float>(49.0f, 1000.0f, 1.0f), 49.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("HIGH_EQ", "highEQ", NormalisableRange<float>(1999.0f, 10000.0f, 1.0f), 1999.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("FILTER", "filter", NormalisableRange<float>(550.0f, 10000.0f, 50.0f), 500.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("GAIN", "gain", NormalisableRange<float>(-8.0f, 2.0f, 0.01f), -5.0f));
+    
+    return {params.begin(), params.end()};
 }
 
 //==============================================================================
@@ -114,11 +131,27 @@ void Twisted_pluginAudioProcessor::changeProgramName (int index, const juce::Str
 //==============================================================================
 void Twisted_pluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    varSynthesiser0.setCurrentPlaybackSampleRate(sampleRate);
     varSynthesiser1.setCurrentPlaybackSampleRate(sampleRate);
     varSynthesiser2.setCurrentPlaybackSampleRate(sampleRate);
     varSynthesiser3.setCurrentPlaybackSampleRate(sampleRate);
     varSynthesiser4.setCurrentPlaybackSampleRate(sampleRate);
+    
+    //Set Auxiliar Buffers from Synth Voices
+    voiceSynth1->setAuxBuffer(getTotalNumOutputChannels(), samplesPerBlock);
+    voiceSynth2->setAuxBuffer(getTotalNumOutputChannels(), samplesPerBlock);
+    voiceSynth3->setAuxBuffer(getTotalNumOutputChannels(), samplesPerBlock);
+    voiceSynth4->setAuxBuffer(getTotalNumOutputChannels(), samplesPerBlock);
+    
+    //DSP prepare
+    dsp::ProcessSpec spec;
+    spec.sampleRate = sampleRate;
+    spec.maximumBlockSize = samplesPerBlock;
+    spec.numChannels = getTotalNumOutputChannels();
+    outputEffects.prepareDSP(spec);
+    reverbSnr.prepareSynthDSP(spec);
+    reverbHH.prepareSynthDSP(spec);
+    reverbPercs.prepareSynthDSP(spec);
+    bassBoost.prepareSynthDSP(spec);
 }
 
 void Twisted_pluginAudioProcessor::releaseResources()
@@ -158,73 +191,137 @@ void Twisted_pluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
+    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i) {
         buffer.clear (i, 0, buffer.getNumSamples());
+    };
     
     keyboardState.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
     
     //MIDI MESSAGES
-    for (const auto meta : midiMessages) {
+    for (const auto meta : midiMessages)
+    {
         const auto msg = meta.getMessage();
-        if (msg.isNoteOn()){
-            isNotePlayed = true;}
-        else if (msg.isNoteOff()){
-            isNotePlayed = false;
-            mSampleCount=0;}
+        if (msg.isNoteOn())
+        {
+            switch(msg.getNoteNumber())
+            {
+                case 84:
+                case 72:
+                    isNotePlayed1 = true;
+                    break;
+                case 86:
+                case 74:
+                    isNotePlayed2 = true;
+                    break;
+                case 88:
+                case 76:
+                    isNotePlayed3 = true;
+                    break;
+                case 89:
+                case 77:
+                    isNotePlayed4 = true;
+                    break;
+            }
+        }
+        else if (msg.isNoteOff())
+        {
+            switch(msg.getNoteNumber())
+            {
+                case 84:
+                case 72:
+                    isNotePlayed1 = false;
+                    break;
+                case 86:
+                case 74:
+                    isNotePlayed2 = false;
+                    break;
+                case 88:
+                case 76:
+                    isNotePlayed3 = false;
+                    break;
+                case 89:
+                case 77:
+                    isNotePlayed4 = false;
+                    break;
+            }
+            if(!isNotePlayed1 && !isNotePlayed2 && !isNotePlayed3 && !isNotePlayed4)
+                resetPlayandStopButtons=true;
+        }
     }
     
     //PLAYBUTTON
     if(playButtonStarts)
     {
-        messageNote1 = MidiMessage::noteOn (1, C5note, (uint8) 100);
-        midiMessages.addEvent(messageNote1, 0);
-        messageNote2 = MidiMessage::noteOn (1, D5note, (uint8) 100);
-        midiMessages.addEvent(messageNote2, 0);
-        messageNote3 = MidiMessage::noteOn (1, E5note, (uint8) 100);
-        midiMessages.addEvent(messageNote3, 0);
-        messageNote4 = MidiMessage::noteOn (1, F5note, (uint8) 100);
-        midiMessages.addEvent(messageNote4, 0);
-        isNotePlayed = true;
+        varSynthesiser1.noteOn(1, C5note, static_cast<uint8>(1));
+        varSynthesiser2.noteOn(1, D5note, static_cast<uint8>(1));
+        varSynthesiser3.noteOn(1, E5note, static_cast<uint8>(1));
+        varSynthesiser4.noteOn(1, F5note, static_cast<uint8>(1));
+        isNotePlayed1 = true;
+        isNotePlayed2 = true;
+        isNotePlayed3 = true;
+        isNotePlayed4 = true;
         playButtonStarts=false;
     }
-    if(playButtonStops)
+    if(stopButtonStarts)
     {
-        messageNote1 = MidiMessage::noteOff (1, C5note, (uint8) 100);
-        midiMessages.addEvent(messageNote1, 0);
-        messageNote2 = MidiMessage::noteOff (1, D5note, (uint8) 100);
-        midiMessages.addEvent(messageNote2, 0);
-        messageNote3 = MidiMessage::noteOff (1, E5note, (uint8) 100);
-        midiMessages.addEvent(messageNote3, 0);
-        messageNote4 = MidiMessage::noteOff (1, F5note, (uint8) 100);
-        midiMessages.addEvent(messageNote4, 0);
-        isNotePlayed = false;
-        playButtonStops=false;
+        varSynthesiser1.noteOff(1, C5note, 0, false);
+        varSynthesiser2.noteOff(1, D5note, 0, false);
+        varSynthesiser3.noteOff(1, E5note, 0, false);
+        varSynthesiser4.noteOff(1, F5note, 0, false);
+        isNotePlayed1 = false;
+        isNotePlayed2 = false;
+        isNotePlayed3 = false;
+        isNotePlayed4 = false;
+        stopButtonStarts=false;
     }
-    
     
     //PLAYHEAD
-    if (isNotePlayed) {
-        //int numUno = 1;
-        //SamplerSound* samplerSound = mySamplerSound(numUno);
-        //DBG(samplerSound->getName());
-        mSampleCount += buffer.getNumSamples();
-    } else {
-        mSampleCount=0;
-    }
-
-    
+    if (isNotePlayed1)
+            playheadValue1 = voiceSynth1->getSourceSamplePos();
+        else
+            playheadValue1=0;
+    if (isNotePlayed2)
+        playheadValue2 = voiceSynth2->getSourceSamplePos();
+        else
+            playheadValue2=0;
+    if (isNotePlayed3)
+        playheadValue3 = voiceSynth3->getSourceSamplePos();
+        else
+            playheadValue3=0;
+    if (isNotePlayed4)
+        playheadValue4 = voiceSynth4->getSourceSamplePos();
+        else
+            playheadValue4=0;
     
     //PLAY SYNTHESISERS
-    if(solo1)
-        varSynthesiser1.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
-     if(solo2)
-         varSynthesiser2.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
-     if(solo3)
-         varSynthesiser3.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
-     if(solo4)
-         varSynthesiser4.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+    varSynthesiser1.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+    auto sliderValueBoost = apvts.getRawParameterValue("BOOST")->load();
+    bassBoost.processSynthBoost(voiceSynth1->getAuxBuffer(), sliderValueBoost); //Get auxiliar buffer from Voice to add effect
+
+    varSynthesiser2.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+    auto sliderValueSnr = apvts.getRawParameterValue("REVERB_SNR")->load();
+    reverbSnr.processSynthReverb(voiceSynth2->getAuxBuffer(), sliderValueSnr); //Get auxiliar buffer from Voice to add effect
+
+    varSynthesiser3.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+    auto sliderValueHH = apvts.getRawParameterValue("REVERB_HH")->load();
+    reverbHH.processSynthReverb(voiceSynth3->getAuxBuffer(), sliderValueHH); //Get auxiliar buffer from Voice to add effect
+
+    varSynthesiser4.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+    auto sliderValuePercs = apvts.getRawParameterValue("REVERB_PERCS")->load();
+    reverbPercs.processSynthReverb(voiceSynth4->getAuxBuffer(), sliderValuePercs); //Get auxiliar buffer from Voice to add effect
+
     
+    //Adding Auxiliar Buffers with effects to Buffer
+    for (auto channel = 0; channel < buffer.getNumChannels(); channel++) {
+        
+        buffer.addFrom(channel, 0, voiceSynth1->getAuxBuffer(), channel, 0, buffer.getNumSamples());
+        buffer.addFrom(channel, 0, voiceSynth2->getAuxBuffer(), channel, 0, buffer.getNumSamples());
+        buffer.addFrom(channel, 0, voiceSynth3->getAuxBuffer(), channel, 0, buffer.getNumSamples());
+        buffer.addFrom(channel, 0, voiceSynth4->getAuxBuffer(), channel, 0, buffer.getNumSamples());
+    }
     
+    outputEffects.processDSP(buffer); //Applying master effects
+            
     midiMessages.clear(); //Disable plugin to generate MIDI at its output
 }
 
@@ -253,88 +350,24 @@ void Twisted_pluginAudioProcessor::setStateInformation (const void* data, int si
     // whose contents will have been created by the getStateInformation() call.
 }
 
-
-
-//OWN FUNCTIONS
-void Twisted_pluginAudioProcessor::loadFileDragged(const String& path, int& varInt)
+//PRIVATE CUSTOM FUNCTIONS
+//Read the file
+void Twisted_pluginAudioProcessor::loadAFile(const File& file, int& varInt, int varSource)
 {
-    myAudioLoadedBy(varInt, 1);
-    mySynthSelected(varInt)->clearSounds();
-    
-    auto file = File(path);
-    varFormatReader = varFormatManager.createReaderFor(file);
-    
-    auto sampleLenght = static_cast<int>(varFormatReader->lengthInSamples);
-    
-    myAudioBuffer(varInt)->setSize(1, sampleLenght);
-    varFormatReader->read (myAudioBuffer(varInt),0,sampleLenght, 0, true, false);
-    
-    String nameString = "Sample" + std::to_string(varInt);
-    SamplerSound* samplerSound = mySamplerSound(varInt);
-    samplerSound = new SamplerSound(nameString, *varFormatReader, myRange(varInt), myNote(varInt), 0.1, 0.1, 10.0);
-    mySynthSelected(varInt)->addSound(samplerSound);
-}
-
-void Twisted_pluginAudioProcessor::loadSampleComboBox(const File& file, int& varInt)
-{
-    myAudioLoadedBy(varInt, 2);
+    myAudioLoadedBy(varInt, varSource);
     mySynthSelected(varInt)->clearSounds();
     
     varFormatReader = varFormatManager.createReaderFor(file);
-    
     auto sampleLenght = static_cast<int>(varFormatReader->lengthInSamples);
-    
     myAudioBuffer(varInt)->setSize(1, sampleLenght);
     varFormatReader->read (myAudioBuffer(varInt),0,sampleLenght, 0, true, false);
     
-    String nameString = "Sample" + std::to_string(varInt);
-    SamplerSound* samplerSound = mySamplerSound(varInt);
-    samplerSound = new SamplerSound(nameString, *varFormatReader, myRange(varInt), myNote(varInt), 0.1, 0.1, 10.0);
-    mySynthSelected(varInt)->addSound(samplerSound);
+    mySoundToSynth(varInt);
+    stopButtonStarts=true;
+    resetPlayandStopButtons=true;
 }
 
-//Selecciona el sintetizador de acuerdo al ultimo elemento usado en la GUI
-Synthesiser* Twisted_pluginAudioProcessor::mySynthSelected(int& varInt)
-{
-    switch(varInt)
-    {
-        case 1:
-            currentSynth = 1;
-            return &varSynthesiser1;
-        case 2:
-            currentSynth = 2;
-            return &varSynthesiser2;
-        case 3:
-            currentSynth = 3;
-            return &varSynthesiser3;
-        case 4:
-            currentSynth = 4;
-            return &varSynthesiser4;
-        default:
-            currentSynth = 0;
-            return &varSynthesiser0;
-    }
-}
-
-//Selecciona el audioBuffer de acuerdo al ultimo elemento usado en la GUI
-AudioBuffer<float>* Twisted_pluginAudioProcessor::myAudioBuffer(int& varInt)
-{
-    switch(varInt)
-    {
-        case 1:
-            return &varAudioBuffer1;
-        case 2:
-            return &varAudioBuffer2;
-        case 3:
-            return &varAudioBuffer3;
-        case 4:
-            return &varAudioBuffer4;
-        default:
-            return &varAudioBuffer0;
-    }
-}
-
-//Identifica fuente del sample (1-drag o 2-combobox) de acuerdo al ultimo elemento usado en la GUI
+//Identify the source of the sample (1-drag, 2-combobox) according to the last element used on GUI.
 void Twisted_pluginAudioProcessor::myAudioLoadedBy(int& varInt, int varInt2)
 {
     switch(varInt)
@@ -352,62 +385,147 @@ void Twisted_pluginAudioProcessor::myAudioLoadedBy(int& varInt, int varInt2)
             audio4LoadedBy = varInt2;
             break;
         default:
-            audio0LoadedBy = varInt2;
+            audio1LoadedBy = varInt2;
             break;
     }
 }
 
-//Controla que sinte tiene permitido escucharse de acuerdo a los botones de solo
+//Select the synth in accordance with the last element used on GUI
+Synthesiser* Twisted_pluginAudioProcessor::mySynthSelected(int& varInt)
+{
+    switch(varInt)
+    {
+        case 1:
+            return &varSynthesiser1;
+        case 2:
+            return &varSynthesiser2;
+        case 3:
+            return &varSynthesiser3;
+        case 4:
+            return &varSynthesiser4;
+        default:
+            return &varSynthesiser1;
+    }
+}
+
+//Select the audioBuffer in accord with the last element used on GUI
+AudioBuffer<float>* Twisted_pluginAudioProcessor::myAudioBuffer(int& varInt)
+{
+    switch(varInt)
+    {
+        case 1:
+            return &varAudioBuffer1;
+        case 2:
+            return &varAudioBuffer2;
+        case 3:
+            return &varAudioBuffer3;
+        case 4:
+            return &varAudioBuffer4;
+        default:
+            return &varAudioBuffer1;
+    }
+}
+
+//Assign the customSamplerSound to the corresponding Synthesiser
+void Twisted_pluginAudioProcessor::mySoundToSynth(int& varInt)
+{
+    String nameString = "Sample" + std::to_string(varInt);
+    switch(varInt)
+    {
+        case 1:
+            customSamplerSound1 = new CustomSamplerSound(nameString, *varFormatReader, range1, C5note, 0.1, 0.1, 10.0);
+            mySynthSelected(varInt)->addSound(customSamplerSound1);
+            break;
+        case 2:
+            customSamplerSound2 = new CustomSamplerSound(nameString, *varFormatReader, range2, D5note, 0.1, 0.1, 10.0);
+            mySynthSelected(varInt)->addSound(customSamplerSound2);
+            break;
+        case 3:
+            customSamplerSound3 = new CustomSamplerSound(nameString, *varFormatReader, range3, E5note, 0.1, 0.1, 10.0);
+            mySynthSelected(varInt)->addSound(customSamplerSound3);
+            break;
+        case 4:
+            customSamplerSound4 = new CustomSamplerSound(nameString, *varFormatReader, range4, F5note, 0.1, 0.1, 10.0);
+            mySynthSelected(varInt)->addSound(customSamplerSound4);
+            break;
+    }
+}
+
+//Controls the synths thath have perrmission to be listened according to the solo buttons (turned off/turned on)
 void Twisted_pluginAudioProcessor::mySoloUpdate(int& varInt, bool varBool)
 {
     if(allSolosDisabled)
     {
-        solo1=false;
-        solo2=false;
-        solo3=false;
-        solo4=false;
+        playAllowed1=false;
+        playAllowed2=false;
+        playAllowed3=false;
+        playAllowed4=false;
         allSolosDisabled=false;
     }
     
     switch(varInt)
     {
         case 1:
-            solo1 = varBool;
+            playAllowed1 = varBool;
             break;
         case 2:
-            solo2 = varBool;
+            playAllowed2 = varBool;
             break;
         case 3:
-            solo3 = varBool;
+            playAllowed3 = varBool;
             break;
         case 4:
-            solo4 = varBool;
-            break;
-        default:
-            solo0 = varBool;
+            playAllowed4 = varBool;
             break;
     }
     
-    if(!solo1&&!solo2&&!solo3&&!solo4)
+    if(!playAllowed1&&!playAllowed2&&!playAllowed3&&!playAllowed4)
     {
-        solo1=true;
-        solo2=true;
-        solo3=true;
-        solo4=true;
+        playAllowed1=true;
+        playAllowed2=true;
+        playAllowed3=true;
+        playAllowed4=true;
         allSolosDisabled=true;
     }
+    
+    if(playAllowed1) voiceSynth1->setVelocity(defaultGain);
+    else voiceSynth1->setVelocity(0);
+    if(playAllowed2) voiceSynth2->setVelocity(defaultGain);
+    else voiceSynth2->setVelocity(0);
+    if(playAllowed3) voiceSynth3->setVelocity(defaultGain);
+    else voiceSynth3->setVelocity(0);
+    if(playAllowed4) voiceSynth4->setVelocity(defaultGain);
+    else voiceSynth4->setVelocity(0);
 }
 
-//Controla botón de Play
-void Twisted_pluginAudioProcessor::myPlay(bool varBool)
+//Informs if the synth is allowed to be played
+bool Twisted_pluginAudioProcessor::myPlayheadAllowed(int& varInt)
 {
-    if(varBool)
-        playButtonStarts=true;
-    else
-        playButtonStops=true;
+    switch(varInt)
+    {
+        case 1:
+            return varSynthesiser1.getVoice(0)->isKeyDown();
+        case 2:
+            return varSynthesiser2.getVoice(0)->isKeyDown();
+        case 3:
+            return varSynthesiser3.getVoice(0)->isKeyDown();
+        case 4:
+            return varSynthesiser4.getVoice(0)->isKeyDown();
+    }
+    return false;
 }
 
-//Informa si se ha cargado audio en el sinte indicado
+//Buttons Play & Stop
+void Twisted_pluginAudioProcessor::myPlay()
+{
+    playButtonStarts=true;
+}
+void Twisted_pluginAudioProcessor::myStop()
+{
+    stopButtonStarts=true;
+}
+
+//Informs if an sample in the selected synth has been loaded
 int Twisted_pluginAudioProcessor::myGetNumSamplerSounds(int& varInt)
 {
     switch(varInt)
@@ -421,12 +539,12 @@ int Twisted_pluginAudioProcessor::myGetNumSamplerSounds(int& varInt)
         case 4:
             return varSynthesiser4.getNumSounds();
         default:
-            return varSynthesiser0.getNumSounds();
+            return varSynthesiser1.getNumSounds();
     }
     
 }
 
-//Obtiene información de variable AudioLoadedBy, la cual indica la fuente del audio
+//Gets data of AudioLoadedBy variable, which indicates the sample source
 int Twisted_pluginAudioProcessor::myGetAudioLoadedBy(int& varInt)
 {
     switch(varInt)
@@ -440,11 +558,11 @@ int Twisted_pluginAudioProcessor::myGetAudioLoadedBy(int& varInt)
         case 4:
             return audio4LoadedBy;
         default:
-            return audio0LoadedBy;
+            return audio1LoadedBy;
     }
 }
 
-//Modifica información de variable AudioLoadedBy, la cual indica la fuente del audio
+//Sets data of AudioLoadedBy variable, which indicates the sample source
 void Twisted_pluginAudioProcessor::mySetAudioLoadedBy(int& varInt, int varInt2)
 {
     switch(varInt)
@@ -462,62 +580,28 @@ void Twisted_pluginAudioProcessor::mySetAudioLoadedBy(int& varInt, int varInt2)
             audio4LoadedBy = varInt2;
             break;
         default:
-            audio0LoadedBy = varInt2;
+            audio1LoadedBy = varInt2;
             break;
     }
 }
 
-SamplerSound* Twisted_pluginAudioProcessor::mySamplerSound(int& varInt)
+//Gets playhead value in accordance with the corresponding synth
+std::atomic<int>& Twisted_pluginAudioProcessor::myGetPlayheadValue(int& varInt)
 {
     switch(varInt)
     {
         case 1:
-            return samplerSound1;
+            return playheadValue1;
         case 2:
-            return samplerSound2;
+            return playheadValue2;
         case 3:
-            return samplerSound3;
+            return playheadValue3;
         case 4:
-            return samplerSound4;
+            return playheadValue4;
         default:
-            return samplerSound1;
+            return playheadValue1;
     }
 }
-
-BigInteger Twisted_pluginAudioProcessor::myRange(int& varInt)
-{
-    switch(varInt)
-    {
-        case 1:
-            return range1;
-        case 2:
-            return range2;
-        case 3:
-            return range3;
-        case 4:
-            return range4;
-        default:
-            return range1;
-    }
-}
-
-int Twisted_pluginAudioProcessor::myNote(int& varInt)
-{
-    switch(varInt)
-    {
-        case 1:
-            return C5note;
-        case 2:
-            return D5note;
-        case 3:
-            return E5note;
-        case 4:
-            return F5note;
-        default:
-            return C5note;
-    }
-}
-
 //==============================================================================
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()

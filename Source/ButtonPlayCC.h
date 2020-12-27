@@ -1,5 +1,4 @@
 
-
 #pragma once
 
 #include <JuceHeader.h>
@@ -20,7 +19,7 @@ public:
     TextButton varTextButton { "" };
 
 private:
-    ButtonLookAndFeel buttonLookAndFeel;
+    ButtonLookAndFeelStart buttonLookAndFeelStart;
     
     Twisted_pluginAudioProcessor& audioProcessor;
     

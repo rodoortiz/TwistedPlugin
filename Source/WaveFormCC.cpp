@@ -1,16 +1,11 @@
 
-
 #include <JuceHeader.h>
 #include "WaveFormCC.h"
 
 //==============================================================================
-WaveFormCC::WaveFormCC(Twisted_pluginAudioProcessor& p) : audioProcessor(p)
+WaveFormCC::WaveFormCC(Twisted_pluginAudioProcessor& p) :  audioProcessor(p)
 {
-    /*
-    g.setColour(Colours::white);
-    g.setFont(20.0f);
-    g.drawFittedText("Drag to Load", getLocalBounds(), Justification::centred, 1);
-     */
+
 }
 
 WaveFormCC::~WaveFormCC()
@@ -36,9 +31,7 @@ void WaveFormCC::paint (juce::Graphics& g)
     
     //DRAG AND DROP
     AudioBuffer<float> waveform = myWaveForm();
-    
-    
-    
+
     if(audioProcessor.myGetNumSamplerSounds(drumSamplerType)>0)
     {
         Path p;
@@ -65,7 +58,8 @@ void WaveFormCC::paint (juce::Graphics& g)
         
         g.strokePath(p, PathStrokeType(2));
         
-        auto playHeadPosition = jmap<int> (audioProcessor.mSampleCount, 0, myWaveForm().getNumSamples(), 0, getWidth());
+        //PLAYHEAD
+        auto playHeadPosition = jmap<int> (audioProcessor.myGetPlayheadValue(drumSamplerType), 0, myWaveForm().getNumSamples(), 0, getWidth());
         g.setColour(Colours::white);
         g.drawLine(playHeadPosition, 0, playHeadPosition, getHeight(), 2.0f);
         
@@ -76,9 +70,8 @@ void WaveFormCC::paint (juce::Graphics& g)
     {
         g.setColour(Colours::white);
         g.setFont(20.0f);
-        g.drawFittedText("Drag to Load", getLocalBounds(), Justification::centred, 1);
+        g.drawFittedText("Load Sample", getLocalBounds(), Justification::centred, 1);
     }
-    
     
 }
 
@@ -104,9 +97,8 @@ void WaveFormCC::filesDropped (const StringArray& files, int x, int y)
     {
         if (isInterestedInFileDrag(files))
         {  
-            auto myFile = std::make_unique<File> (file);
-            
-            audioProcessor.loadFileDragged(file, drumSamplerType);
+            auto theFile = File(file);
+            audioProcessor.loadAFile(theFile, drumSamplerType, 1);
         }
     }
     
@@ -132,7 +124,7 @@ AudioBuffer<float> WaveFormCC::myWaveForm()
         case 4:
             return audioProcessor.varAudioBuffer4;
         default:
-            return audioProcessor.varAudioBuffer0;
+            return audioProcessor.varAudioBuffer1;
     }
 }
 

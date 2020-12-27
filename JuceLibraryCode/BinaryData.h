@@ -8,17 +8,14 @@
 
 namespace BinaryData
 {
-    extern const char*   Twisted_Image_1_png;
-    const int            Twisted_Image_1_pngSize = 134450;
+    extern const char*   SH_Logo_png;
+    const int            SH_Logo_pngSize = 101389;
 
-    extern const char*   Twisted_Image_2_png;
-    const int            Twisted_Image_2_pngSize = 131922;
-
-    extern const char*   Twisted_Image_3_png;
-    const int            Twisted_Image_3_pngSize = 5476;
+    extern const char*   Twisted_No_Logo_png;
+    const int            Twisted_No_Logo_pngSize = 1795320;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 3;
+    const int namedResourceListSize = 2;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

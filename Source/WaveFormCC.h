@@ -1,5 +1,4 @@
 
-
 #pragma once
 
 #include <JuceHeader.h>
@@ -22,15 +21,13 @@ public:
     
     bool isInterestedInFileDrag (const StringArray& files) override;
     void filesDropped (const StringArray& files, int x, int y) override;
-    
-    int drumSamplerType=0;
+
     void setDrumSamplerType(int varInt);
+    AudioBuffer<float> myWaveForm();
 
 private:
-    AudioBuffer<float> myWaveForm();
-        
     std::vector<float> mAudioPoints;
-    bool mShouldBePainting{false};
+    int drumSamplerType=0;
 
     Twisted_pluginAudioProcessor& audioProcessor;
     

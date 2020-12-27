@@ -1,5 +1,4 @@
 
-
 #pragma once
 
 #include <JuceHeader.h>
@@ -29,7 +28,6 @@ public:
     void setDrumSamplerPath (File file)  { drumSamplerPath(file); }
 
 private:
- 
     void drumSamplerPath(File file);
         
     ComboBoxLookAndFeel comboBoxLookAndFeel;

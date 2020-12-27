@@ -5,44 +5,54 @@
               pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn">
   <MAINGROUP id="GHzs4l" name="TwistedPlugin">
     <GROUP id="{90D450FC-DA0F-558D-A395-DC16EE504A16}" name="Source">
-      <GROUP id="{D6F24137-D80E-2FB1-8496-71EE7BEB8D87}" name="Resources">
-        <FILE id="rAKDGa" name="FileManager.cpp" compile="1" resource="0" file="Resources/FileManager.cpp"/>
-        <FILE id="mX6Gp7" name="Twisted_Image_1.png" compile="0" resource="1"
-              file="Resources/Twisted_Image_1.png"/>
-        <FILE id="dq4pnF" name="Twisted_Image_2.png" compile="0" resource="1"
-              file="Resources/Twisted_Image_2.png"/>
-        <FILE id="RPePxj" name="Twisted_Image_3.png" compile="0" resource="1"
-              file="Resources/Twisted_Image_3.png"/>
-      </GROUP>
-      <FILE id="G0YyRN" name="ButtonLookAndFeel.h" compile="0" resource="0"
+      <FILE id="CXgtjy" name="ButtonLookAndFeel.h" compile="0" resource="0"
             file="Source/ButtonLookAndFeel.h"/>
-      <FILE id="t2ITR4" name="ButtonPlayCC.cpp" compile="1" resource="0"
+      <FILE id="bq69y6" name="ButtonPlayCC.cpp" compile="1" resource="0"
             file="Source/ButtonPlayCC.cpp"/>
-      <FILE id="nDt9tn" name="ButtonPlayCC.h" compile="0" resource="0" file="Source/ButtonPlayCC.h"/>
-      <FILE id="HuEjiB" name="ButtonSoloCC.cpp" compile="1" resource="0"
+      <FILE id="Vhx2rN" name="ButtonPlayCC.h" compile="0" resource="0" file="Source/ButtonPlayCC.h"/>
+      <FILE id="SYRaLJ" name="ButtonSoloCC.cpp" compile="1" resource="0"
             file="Source/ButtonSoloCC.cpp"/>
-      <FILE id="K1VdXk" name="ButtonSoloCC.h" compile="0" resource="0" file="Source/ButtonSoloCC.h"/>
-      <FILE id="ZbbJd8" name="ComboBoxCC.cpp" compile="1" resource="0" file="Source/ComboBoxCC.cpp"/>
-      <FILE id="xaikk5" name="ComboBoxCC.h" compile="0" resource="0" file="Source/ComboBoxCC.h"/>
-      <FILE id="qmPeLC" name="ComboBoxLookAndFeel.h" compile="0" resource="0"
+      <FILE id="cPEz8I" name="ButtonSoloCC.h" compile="0" resource="0" file="Source/ButtonSoloCC.h"/>
+      <FILE id="KgF91P" name="ButtonStopCC.cpp" compile="1" resource="0"
+            file="Source/ButtonStopCC.cpp"/>
+      <FILE id="PBJnNc" name="ButtonStopCC.h" compile="0" resource="0" file="Source/ButtonStopCC.h"/>
+      <FILE id="cCXEfK" name="ComboBoxCC.cpp" compile="1" resource="0" file="Source/ComboBoxCC.cpp"/>
+      <FILE id="rLeMWV" name="ComboBoxCC.h" compile="0" resource="0" file="Source/ComboBoxCC.h"/>
+      <FILE id="KsPWx3" name="ComboBoxLookAndFeel.h" compile="0" resource="0"
             file="Source/ComboBoxLookAndFeel.h"/>
-      <FILE id="MSB8Ud" name="FileManager.cpp" compile="1" resource="0" file="Source/FileManager.cpp"/>
-      <FILE id="jqOKrQ" name="LabelSamplerCC.cpp" compile="1" resource="0"
+      <FILE id="kQ1D3j" name="CustomSynthCC.cpp" compile="1" resource="0"
+            file="Source/CustomSynthCC.cpp"/>
+      <FILE id="A7cwYN" name="CustomSynthCC.h" compile="0" resource="0" file="Source/CustomSynthCC.h"/>
+      <FILE id="SOEvxC" name="DspProcessor.cpp" compile="1" resource="0"
+            file="Source/DspProcessor.cpp"/>
+      <FILE id="AzbyNf" name="DspProcessor.h" compile="0" resource="0" file="Source/DspProcessor.h"/>
+      <FILE id="wbcIn3" name="FileManager.cpp" compile="1" resource="0" file="Source/FileManager.cpp"/>
+      <FILE id="STMnqU" name="LabelSamplerCC.cpp" compile="1" resource="0"
             file="Source/LabelSamplerCC.cpp"/>
-      <FILE id="DRL9TK" name="LabelSamplerCC.h" compile="0" resource="0"
+      <FILE id="pOGek0" name="LabelSamplerCC.h" compile="0" resource="0"
             file="Source/LabelSamplerCC.h"/>
-      <FILE id="rArgbh" name="MidiKeyboard.cpp" compile="1" resource="0"
+      <FILE id="j8X55v" name="MasterSliders.h" compile="0" resource="0" file="Source/MasterSliders.h"/>
+      <FILE id="RAEE1U" name="MidiKeyboard.cpp" compile="1" resource="0"
             file="Source/MidiKeyboard.cpp"/>
-      <FILE id="lZvfor" name="MidiKeyboard.h" compile="0" resource="0" file="Source/MidiKeyboard.h"/>
-      <FILE id="O56bTi" name="PluginEditor.cpp" compile="1" resource="0"
+      <FILE id="nPTYoo" name="MidiKeyboard.h" compile="0" resource="0" file="Source/MidiKeyboard.h"/>
+      <FILE id="iSYEtp" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
-      <FILE id="i5NNpD" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
-      <FILE id="olwce3" name="PluginProcessor.cpp" compile="1" resource="0"
+      <FILE id="UgQVnu" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="fw330V" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
-      <FILE id="RgUC4D" name="PluginProcessor.h" compile="0" resource="0"
+      <FILE id="InGyB0" name="PluginProcessor.h" compile="0" resource="0"
             file="Source/PluginProcessor.h"/>
-      <FILE id="v6VzOG" name="WaveFormCC.cpp" compile="1" resource="0" file="Source/WaveFormCC.cpp"/>
-      <FILE id="lt5ubF" name="WaveFormCC.h" compile="0" resource="0" file="Source/WaveFormCC.h"/>
+      <FILE id="KJPVxk" name="ReverbAndBoostSlider.cpp" compile="1" resource="0"
+            file="Source/ReverbAndBoostSlider.cpp"/>
+      <FILE id="ip5i1B" name="ReverbAndBoostSlider.h" compile="0" resource="0"
+            file="Source/ReverbAndBoostSlider.h"/>
+      <FILE id="IJvuFK" name="WaveFormCC.cpp" compile="1" resource="0" file="Source/WaveFormCC.cpp"/>
+      <FILE id="U3lvCE" name="WaveFormCC.h" compile="0" resource="0" file="Source/WaveFormCC.h"/>
+    </GROUP>
+    <GROUP id="{D6F24137-D80E-2FB1-8496-71EE7BEB8D87}" name="Resources">
+      <FILE id="xuD5Nm" name="SH_Logo.png" compile="0" resource="1" file="Resources/SH_Logo.png"/>
+      <FILE id="PLliVC" name="Twisted_No_Logo.png" compile="0" resource="1"
+            file="Resources/Twisted_No_Logo.png"/>
     </GROUP>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
