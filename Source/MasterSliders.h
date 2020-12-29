@@ -1,6 +1,16 @@
+/*
+  ==============================================================================
+
+    MasterSliders.h
+    Created: 13 Dec 2020 7:12:38pm
+    Author:  Rodolfo Ortiz
+
+  ==============================================================================
+*/
 
 #pragma once
 #include <JuceHeader.h>
+#include "SlidersLookandFeel.h"
 
 class MasterSliders : public Component {
 public:
@@ -11,6 +21,7 @@ public:
         highEQSlider = std::make_unique<Slider>();
         
         //gainSlider attributes
+        gainSlider->setLookAndFeel(&customSlidersLookAndFeel);
         gainSlider->setSliderStyle(Slider::Rotary);
         gainSlider->setTextBoxStyle(Slider::TextBoxBelow, false, 60, 15);
         gainSlider->setColour(Slider::thumbColourId, Colours::aquamarine);
@@ -19,6 +30,7 @@ public:
         gainSlider->setTextValueSuffix(" dB");
         addAndMakeVisible(gainSlider.get());
         //filterSlider attributes
+        filterSlider->setLookAndFeel(&customSlidersLookAndFeel);
         filterSlider->setSliderStyle(Slider::Rotary);
         filterSlider->setTextBoxStyle(Slider::TextBoxBelow, false, 60, 15);
         filterSlider->setColour(Slider::thumbColourId, Colours::aquamarine);
@@ -27,6 +39,7 @@ public:
         filterSlider->setTextValueSuffix(" Hz");
         addAndMakeVisible(filterSlider.get());
         //lowEQSlider attributes
+        lowEQSlider->setLookAndFeel(&customSlidersLookAndFeel);
         lowEQSlider->setSliderStyle(Slider::Rotary);
         lowEQSlider->setTextBoxStyle(Slider::TextBoxBelow, false, 60, 15);
         lowEQSlider->setColour(Slider::thumbColourId, Colours::aquamarine);
@@ -35,6 +48,7 @@ public:
         lowEQSlider->setTextValueSuffix(" Hz");
         addAndMakeVisible(lowEQSlider.get());
         //highEQSlider attributes
+        highEQSlider->setLookAndFeel(&customSlidersLookAndFeel);
         highEQSlider->setSliderStyle(Slider::Rotary);
         highEQSlider->setTextBoxStyle(Slider::TextBoxBelow, false, 60, 15);
         highEQSlider->setColour(Slider::thumbColourId, Colours::aquamarine);
@@ -65,5 +79,7 @@ private:
     
     std::unique_ptr<Slider> gainSlider, filterSlider, lowEQSlider, highEQSlider;
     std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> gainSliderAttachment, filterSliderAttachment, lowEQSliderAttachment, highEQSliderAttachment;
+    
+    MasterSlidersLookAndFeel customSlidersLookAndFeel;
 };
 

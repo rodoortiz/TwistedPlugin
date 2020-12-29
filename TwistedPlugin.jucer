@@ -46,10 +46,14 @@
             file="Source/ReverbAndBoostSlider.cpp"/>
       <FILE id="ip5i1B" name="ReverbAndBoostSlider.h" compile="0" resource="0"
             file="Source/ReverbAndBoostSlider.h"/>
+      <FILE id="uRyol1" name="SlidersLookandFeel.h" compile="0" resource="0"
+            file="Source/SlidersLookandFeel.h"/>
       <FILE id="IJvuFK" name="WaveFormCC.cpp" compile="1" resource="0" file="Source/WaveFormCC.cpp"/>
       <FILE id="U3lvCE" name="WaveFormCC.h" compile="0" resource="0" file="Source/WaveFormCC.h"/>
     </GROUP>
     <GROUP id="{D6F24137-D80E-2FB1-8496-71EE7BEB8D87}" name="Resources">
+      <FILE id="giW0Ur" name="Knob_example.png" compile="0" resource="1"
+            file="Resources/Knob_example.png"/>
       <FILE id="xuD5Nm" name="SH_Logo.png" compile="0" resource="1" file="Resources/SH_Logo.png"/>
       <FILE id="PLliVC" name="Twisted_No_Logo.png" compile="0" resource="1"
             file="Resources/Twisted_No_Logo.png"/>

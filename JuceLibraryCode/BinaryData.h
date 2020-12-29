@@ -8,6 +8,9 @@
 
 namespace BinaryData
 {
+    extern const char*   Knob_example_png;
+    const int            Knob_example_pngSize = 285265;
+
     extern const char*   SH_Logo_png;
     const int            SH_Logo_pngSize = 101389;
 
@@ -15,7 +18,7 @@ namespace BinaryData
     const int            Twisted_No_Logo_pngSize = 1795320;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 2;
+    const int namedResourceListSize = 3;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

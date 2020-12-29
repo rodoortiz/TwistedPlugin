@@ -1,8 +1,18 @@
+/*
+  ==============================================================================
+
+    ReverbSlider.h
+    Created: 4 Dec 2020 10:21:58am
+    Author:  Rodolfo Ortiz
+
+  ==============================================================================
+*/
 
 #pragma once
 
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
+#include "SlidersLookandFeel.h"
 
 class ReverbAndBoostSlider : public Component {
 public:
@@ -17,6 +27,7 @@ public:
     
 private:
     Twisted_pluginAudioProcessor& processor;
+    EffectsSlidersLookAndFeel customSlidersLookAndFeel;
     
     //std::unique_ptr<Slider> reverbSlider;
     

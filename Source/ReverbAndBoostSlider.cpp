@@ -1,9 +1,19 @@
+/*
+  ==============================================================================
+
+    ReverbSlider.cpp
+    Created: 4 Dec 2020 10:21:58am
+    Author:  Rodolfo Ortiz
+
+  ==============================================================================
+*/
 
 #include "ReverbAndBoostSlider.h"
 
 ReverbAndBoostSlider::ReverbAndBoostSlider(Twisted_pluginAudioProcessor& p) : processor(p) {
     slider = std::make_unique<Slider>();
     
+    slider->setLookAndFeel(&customSlidersLookAndFeel);
     slider->setSliderStyle(Slider::Rotary);
     slider->setTextBoxStyle(Slider::TextBoxBelow, false, 50, 15);
     slider->setColour(Slider::thumbColourId, Colours::cadetblue);
