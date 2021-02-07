@@ -1,3 +1,12 @@
+/*
+  ==============================================================================
+
+    WaveFormCC.cpp
+    Created: 6 Nov 2020 12:37:55pm
+    Author:  Samuel Martínez
+
+  ==============================================================================
+*/
 
 #include <JuceHeader.h>
 #include "WaveFormCC.h"
@@ -30,9 +39,9 @@ void WaveFormCC::paint (juce::Graphics& g)
     g.fillAll(Colours::darkgrey.darker());
     
     //DRAG AND DROP
-    AudioBuffer<float> waveform = myWaveForm();
+    AudioBuffer<float> waveform = *audioProcessor.myAudioBuffer(drumSamplerType);
 
-    if(audioProcessor.myGetNumSamplerSounds(drumSamplerType)>0)
+    if(audioProcessor.mySamplerSoundExists(drumSamplerType))
     {
         Path p;
         mAudioPoints.clear();
@@ -59,7 +68,7 @@ void WaveFormCC::paint (juce::Graphics& g)
         g.strokePath(p, PathStrokeType(2));
         
         //PLAYHEAD
-        auto playHeadPosition = jmap<int> (audioProcessor.myGetPlayheadValue(drumSamplerType), 0, myWaveForm().getNumSamples(), 0, getWidth());
+        auto playHeadPosition = jmap<int> (audioProcessor.myGetPlayheadValue(drumSamplerType), 0, audioProcessor.myAudioBuffer(drumSamplerType)->getNumSamples(), 0, getWidth());
         g.setColour(Colours::white);
         g.drawLine(playHeadPosition, 0, playHeadPosition, getHeight(), 2.0f);
         
@@ -109,23 +118,3 @@ void WaveFormCC::setDrumSamplerType(int varInt)
 {
     drumSamplerType = varInt;
 }
-
-//Selecciona el audioBuffer de acuerdo al ultimo elemento usado en la GUI
-AudioBuffer<float> WaveFormCC::myWaveForm()
-{
-    switch(drumSamplerType)
-    {
-        case 1:
-            return audioProcessor.varAudioBuffer1;
-        case 2:
-            return audioProcessor.varAudioBuffer2;
-        case 3:
-            return audioProcessor.varAudioBuffer3;
-        case 4:
-            return audioProcessor.varAudioBuffer4;
-        default:
-            return audioProcessor.varAudioBuffer1;
-    }
-}
-
-

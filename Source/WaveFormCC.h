@@ -1,3 +1,12 @@
+/*
+  ==============================================================================
+
+    WaveFormCC.h
+    Created: 6 Nov 2020 12:37:55pm
+    Author:  Samuel Martínez
+
+  ==============================================================================
+*/
 
 #pragma once
 
@@ -23,7 +32,6 @@ public:
     void filesDropped (const StringArray& files, int x, int y) override;
 
     void setDrumSamplerType(int varInt);
-    AudioBuffer<float> myWaveForm();
 
 private:
     std::vector<float> mAudioPoints;

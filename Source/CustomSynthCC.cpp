@@ -1,4 +1,8 @@
-
+/*
+  ==============================================================================
+   *Adapted from juce_Sampler*
+  ==============================================================================
+*/
 #include "CustomSynthCC.h"
 
 CustomSamplerSound::CustomSamplerSound (const String& soundName,

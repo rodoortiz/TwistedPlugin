@@ -26,10 +26,6 @@ public:
     std::unique_ptr<Slider> slider;
     
 private:
-    Twisted_pluginAudioProcessor& processor;
     EffectsSlidersLookAndFeel customSlidersLookAndFeel;
-    
-    //std::unique_ptr<Slider> reverbSlider;
-    
-    
+    Twisted_pluginAudioProcessor& processor;
 };

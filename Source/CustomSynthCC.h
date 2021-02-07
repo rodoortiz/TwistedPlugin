@@ -1,3 +1,8 @@
+/*
+  ==============================================================================
+   *Adapted from juce_Sampler*
+  ==============================================================================
+*/
 
 #include <JuceHeader.h>
 #include "DspProcessor.h"
@@ -64,6 +69,7 @@ public:
     
     //==============================================================================
     int getSourceSamplePos(){ return  (int)sourceSamplePosition; }
+    void setSourceSamplePos0(){ sourceSamplePosition=0; }
     void setVelocity(float varFloat) { lgain = varFloat; rgain = varFloat; }
     
     void setAuxBuffer(int size, int channels);

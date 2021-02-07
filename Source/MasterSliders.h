@@ -65,6 +65,10 @@ public:
     }
     
     ~MasterSliders() override {
+        gainSlider->setLookAndFeel(0);
+        filterSlider->setLookAndFeel(0);
+        lowEQSlider->setLookAndFeel(0);
+        highEQSlider->setLookAndFeel(0);
     }
     
     void resized() override {
@@ -75,11 +79,11 @@ public:
     }
     
 private:
+    MasterSlidersLookAndFeel customSlidersLookAndFeel;
+    
     Twisted_pluginAudioProcessor& processor;
     
     std::unique_ptr<Slider> gainSlider, filterSlider, lowEQSlider, highEQSlider;
     std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> gainSliderAttachment, filterSliderAttachment, lowEQSliderAttachment, highEQSliderAttachment;
-    
-    MasterSlidersLookAndFeel customSlidersLookAndFeel;
 };
 

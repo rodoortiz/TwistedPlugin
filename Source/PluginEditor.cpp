@@ -80,13 +80,20 @@ void Twisted_pluginAudioProcessorEditor::paint (juce::Graphics& g)
         buttonPlayCC.varTextButton.setEnabled(true);
     };
     
-    if(audioProcessor.resetPlayandStopButtons)
+    
+    if(audioProcessor.isPlaying)
     {
+        if(!audioProcessor.keyboardState.isNoteOn(1, 84) &&
+           !audioProcessor.keyboardState.isNoteOn(1, 86) &&
+           !audioProcessor.keyboardState.isNoteOn(1, 88) &&
+           !audioProcessor.keyboardState.isNoteOn(1, 89) )
+        {
         buttonStopCC.varTextButton.setToggleState(true, dontSendNotification);
         buttonStopCC.varTextButton.setEnabled(false);
         buttonPlayCC.varTextButton.setToggleState(false, dontSendNotification);
         buttonPlayCC.varTextButton.setEnabled(true);
-        audioProcessor.resetPlayandStopButtons=false;
+            audioProcessor.isPlaying=false; 
+        }
     }
 }
 

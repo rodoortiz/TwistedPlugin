@@ -1,3 +1,12 @@
+/*
+  ==============================================================================
+
+    ComboBoxLookAndFeel.h
+    Created: 13 Nov 2020 12:50:10pm
+    Author:  Samuel Martínez
+
+  ==============================================================================
+*/
 
 #pragma once
 class ComboBoxLookAndFeel : public LookAndFeel_V4

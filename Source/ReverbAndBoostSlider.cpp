@@ -23,7 +23,7 @@ ReverbAndBoostSlider::ReverbAndBoostSlider(Twisted_pluginAudioProcessor& p) : pr
 }
 
 ReverbAndBoostSlider::~ReverbAndBoostSlider() {
-    
+    slider->setLookAndFeel(0);
 }
 
 std::vector<std::unique_ptr<ReverbAndBoostSlider>> ReverbAndBoostSlider::createObjects(Twisted_pluginAudioProcessor& p) {

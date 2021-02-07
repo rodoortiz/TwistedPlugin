@@ -1,3 +1,12 @@
+/*
+  ==============================================================================
+
+    ButtonSoloCC.cpp
+    Created: 19 Nov 2020 4:42:59pm
+    Author:  Samuel Martínez
+
+  ==============================================================================
+*/
 
 #include <JuceHeader.h>
 #include "ButtonSoloCC.h"
@@ -42,7 +51,7 @@ std::vector<std::unique_ptr<ButtonSoloCC>> ButtonSoloCC::createObjects(Twisted_p
 
 void ButtonSoloCC::paint (juce::Graphics& g)
 {
-    if(audioProcessor.myGetNumSamplerSounds(drumSamplerType)>0)
+    if(audioProcessor.mySamplerSoundExists(drumSamplerType))
     {
         aSampleIsLoaded();
     }

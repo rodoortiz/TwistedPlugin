@@ -1,3 +1,12 @@
+/*
+  ==============================================================================
+
+    ComboBoxCC.cpp
+    Created: 11 Nov 2020 2:03:17pm
+    Author:  Samuel Martínez
+
+  ==============================================================================
+*/
 
 #include <JuceHeader.h>
 #include "ComboBoxCC.h"
@@ -36,7 +45,7 @@ std::vector<std::unique_ptr<ComboBoxCC>> ComboBoxCC::createObjects(Twisted_plugi
 
 void ComboBoxCC::paint (juce::Graphics& g)
 {
-    if(audioProcessor.myGetNumSamplerSounds(drumSamplerType)>0)
+    if(audioProcessor.mySamplerSoundExists(drumSamplerType))
     {
         if(audioProcessor.myGetAudioLoadedBy(drumSamplerType) == 1)
             varComboBox.setSelectedId(0);
@@ -78,7 +87,7 @@ void ComboBoxCC::drumSamplerPath(File directoryFile)
     varComboBox.onChange = [&]()
     {
         if(varComboBox.getSelectedId() != 0)
-            audioProcessor.loadAFile(files[varComboBox.getSelectedId()-1], drumSamplerType, 2);
+            audioProcessor.loadAFile(files[varComboBox.getSelectedId()], drumSamplerType, 2);
     };
     addAndMakeVisible(varComboBox);
     
@@ -97,5 +106,7 @@ void ComboBoxCC::drumSamplerPath(File directoryFile)
             varComboBox.setSelectedId(1);
     };
     addAndMakeVisible(textButtonR);
+    
+    //varComboBox.setSelectedId(1);
 }
 
