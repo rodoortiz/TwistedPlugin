@@ -457,6 +457,7 @@ void Twisted_pluginAudioProcessor::loadAFile(const File& file, int& varInt, int 
 
     mySoundToSynth(varInt);
     stopButtonStarts=true;
+    buttonsResetProcess=true;
 }
 
 //Identify the source of the sample (1-drag, 2-combobox) according to the last element used on GUI.

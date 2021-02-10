@@ -17,7 +17,7 @@
       <FILE id="xG2xa7" name="ButtonStopCC.cpp" compile="1" resource="0"
             file="Source/ButtonStopCC.cpp"/>
       <FILE id="EvF4WQ" name="ButtonStopCC.h" compile="0" resource="0" file="Source/ButtonStopCC.h"/>
-      <FILE id="tQgepS" name="ComboBoxCC.cpp" compile="1" resource="0" file="Source/ComboBoxCC.cpp"/>
+      <FILE id="R6rpyO" name="ComboBoxCC.cpp" compile="1" resource="0" file="Source/ComboBoxCC.cpp"/>
       <FILE id="o6gOdC" name="ComboBoxCC.h" compile="0" resource="0" file="Source/ComboBoxCC.h"/>
       <FILE id="jSTfR1" name="ComboBoxLookAndFeel.h" compile="0" resource="0"
             file="Source/ComboBoxLookAndFeel.h"/>
@@ -36,12 +36,12 @@
       <FILE id="GkOoay" name="MidiKeyboard.cpp" compile="1" resource="0"
             file="Source/MidiKeyboard.cpp"/>
       <FILE id="c23oin" name="MidiKeyboard.h" compile="0" resource="0" file="Source/MidiKeyboard.h"/>
-      <FILE id="TyrvNq" name="PluginEditor.cpp" compile="1" resource="0"
+      <FILE id="osoHqL" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
-      <FILE id="nB9PM6" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
-      <FILE id="lKFU8z" name="PluginProcessor.cpp" compile="1" resource="0"
+      <FILE id="Lncp38" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="cvnjDP" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
-      <FILE id="Uhkx9M" name="PluginProcessor.h" compile="0" resource="0"
+      <FILE id="iS2rFn" name="PluginProcessor.h" compile="0" resource="0"
             file="Source/PluginProcessor.h"/>
       <FILE id="piIlSP" name="ReverbAndBoostSlider.cpp" compile="1" resource="0"
             file="Source/ReverbAndBoostSlider.cpp"/>

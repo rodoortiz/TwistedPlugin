@@ -69,17 +69,12 @@ void ComboBoxCC::setDrumSamplerType(int varInt)
 
 void ComboBoxCC::drumSamplerPath(File directoryFile)
 {
-
-    directoryFile.findChildFiles(files, File::findFiles, false);
-    int itemCount = 0;
+    files = directoryFile.findChildFiles(File::findFiles, false, "*.wav");
+    files.sort();
     for (int i = 0; i < files.size(); i++)
     {
         File file = files.getReference(i);
-        if(file.getFileExtension() == ".wav")
-        {
-            itemCount++;
-            varComboBox.addItem(file.getFileNameWithoutExtension(), itemCount);
-        }
+        varComboBox.addItem(file.getFileNameWithoutExtension(), i+1);
     }
     
     varComboBox.setJustificationType(Justification::centred);
@@ -87,7 +82,7 @@ void ComboBoxCC::drumSamplerPath(File directoryFile)
     varComboBox.onChange = [&]()
     {
         if(varComboBox.getSelectedId() != 0)
-            audioProcessor.loadAFile(files[varComboBox.getSelectedId()], drumSamplerType, 2);
+            audioProcessor.loadAFile(files[varComboBox.getSelectedId()-1], drumSamplerType, 2);
     };
     addAndMakeVisible(varComboBox);
     

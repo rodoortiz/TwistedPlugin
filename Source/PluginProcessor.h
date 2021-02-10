@@ -72,7 +72,7 @@ public:
     void myGetBPM();
 
     AudioBuffer<float> varAudioBuffer1, varAudioBuffer2, varAudioBuffer3, varAudioBuffer4;
-    bool isPlaying;
+    bool isPlaying, buttonsResetProcess;
 
     //MidiKeyboard
     MidiKeyboardState keyboardState;

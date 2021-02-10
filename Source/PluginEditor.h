@@ -61,7 +61,7 @@ private:
     float comboBoxXpos = 0.4625f;
     float reverbSliderXpos = 0.68f;
     float masterSlidersXpos = 0.74f;
-
+    
     ButtonPlayCC buttonPlayCC;
     ButtonStopCC buttonStopCC;
     

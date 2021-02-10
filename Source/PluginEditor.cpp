@@ -80,7 +80,6 @@ void Twisted_pluginAudioProcessorEditor::paint (juce::Graphics& g)
         buttonPlayCC.varTextButton.setEnabled(true);
     };
     
-    
     if(audioProcessor.isPlaying)
     {
         if(!audioProcessor.keyboardState.isNoteOn(1, 84) &&
@@ -88,12 +87,18 @@ void Twisted_pluginAudioProcessorEditor::paint (juce::Graphics& g)
            !audioProcessor.keyboardState.isNoteOn(1, 88) &&
            !audioProcessor.keyboardState.isNoteOn(1, 89) )
         {
+            audioProcessor.buttonsResetProcess=true;
+        }
+    }
+    
+    if(audioProcessor.buttonsResetProcess)
+    {
         buttonStopCC.varTextButton.setToggleState(true, dontSendNotification);
         buttonStopCC.varTextButton.setEnabled(false);
         buttonPlayCC.varTextButton.setToggleState(false, dontSendNotification);
         buttonPlayCC.varTextButton.setEnabled(true);
-            audioProcessor.isPlaying=false; 
-        }
+        audioProcessor.isPlaying=false;
+        audioProcessor.buttonsResetProcess=false;
     }
 }
 
