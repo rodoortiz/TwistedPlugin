@@ -36,3 +36,25 @@ private:
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LabelSamplerCC)
 };
+
+//==============================================================================
+
+class LabelsEffects : public juce::Component
+{
+public:
+    LabelsEffects(Twisted_pluginAudioProcessor& p);
+    ~LabelsEffects();
+
+    static std::vector<std::unique_ptr<LabelsEffects>> createObjects(Twisted_pluginAudioProcessor& p);
+
+    void resized() override;
+
+private:
+    void setLabelsEffects (String string)  { effectLabel.setText(string, dontSendNotification); }
+
+    Label effectLabel;
+
+    Twisted_pluginAudioProcessor& audioProcessor;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LabelsEffects)
+};

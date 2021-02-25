@@ -36,6 +36,7 @@ public:
 private:
     std::vector<float> mAudioPoints;
     int drumSamplerType=0;
+    String currentName {""};
 
     Twisted_pluginAudioProcessor& audioProcessor;
     

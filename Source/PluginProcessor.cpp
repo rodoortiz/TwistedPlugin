@@ -30,20 +30,18 @@ Twisted_pluginAudioProcessor::Twisted_pluginAudioProcessor()
     varSynthesiser4.addVoice(new CustomSamplerVoice());
 
     //ranges initializer
-    range1.setBit(C5note);
-    range1D.setBit(C4note);
-    range2.setBit(D5note);
-    range2D.setBit(D4note);
-    range3.setBit(E5note);
-    range3D.setBit(E4note);
-    range4.setBit(F5note);
-    range4D.setBit(F4note);
+    range1.setBit(C3note);
+    range2.setBit(D3note);
+    range3.setBit(E3note);
+    range4.setBit(F3note);
 
     //Get Voice of each synthesiser, each one has one voice
     voiceSynth1 = static_cast<CustomSamplerVoice*>(varSynthesiser1.getVoice(0));
     voiceSynth2 = static_cast<CustomSamplerVoice*>(varSynthesiser2.getVoice(0));
     voiceSynth3 = static_cast<CustomSamplerVoice*>(varSynthesiser3.getVoice(0));
     voiceSynth4 = static_cast<CustomSamplerVoice*>(varSynthesiser4.getVoice(0));
+
+    setLatencySamples(2050);
 }
 
 Twisted_pluginAudioProcessor::~Twisted_pluginAudioProcessor()
@@ -54,14 +52,14 @@ Twisted_pluginAudioProcessor::~Twisted_pluginAudioProcessor()
 //Creating parameters layout
 AudioProcessorValueTreeState::ParameterLayout Twisted_pluginAudioProcessor::paramLayout() {
     std::vector<std::unique_ptr<RangedAudioParameter>> params;
-    params.push_back(std::make_unique<AudioParameterFloat>("BOOST", "boost", NormalisableRange<float>(49.0f, 160.0f, 1.0f), 49.0f));
-    params.push_back(std::make_unique<AudioParameterFloat>("REVERB_SNR", "reverbSnr", NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.0f));
-    params.push_back(std::make_unique<AudioParameterFloat>("REVERB_HH", "reverbHh", NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.0f));
-    params.push_back(std::make_unique<AudioParameterFloat>("REVERB_PERCS", "reverbPercs", NormalisableRange<float>(0.0f, 1.0f, 0.01f), 0.0f));
-    params.push_back(std::make_unique<AudioParameterFloat>("LOW_EQ", "lowEQ", NormalisableRange<float>(49.0f, 1000.0f, 1.0f), 49.0f));
-    params.push_back(std::make_unique<AudioParameterFloat>("HIGH_EQ", "highEQ", NormalisableRange<float>(1999.0f, 10000.0f, 1.0f), 1999.0f));
-    params.push_back(std::make_unique<AudioParameterFloat>("FILTER", "filter", NormalisableRange<float>(550.0f, 10000.0f, 50.0f), 500.0f));
-    params.push_back(std::make_unique<AudioParameterFloat>("GAIN", "gain", NormalisableRange<float>(-8.0f, 2.0f, 0.01f), -5.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("BOOST", "Boost", NormalisableRange<float>(49.0f, 160.0f, 1.0f), 49.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("REVERB_SNR", "ReverbSnr", NormalisableRange<float>(0.0f, 100.0f, 1.0f), 0.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("REVERB_HH", "ReverbHh", NormalisableRange<float>(0.0f, 100.0f, 1.0f), 0.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("REVERB_PERCS", "ReverbPercs", NormalisableRange<float>(0.0f, 100.0f, 1.0f), 0.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("LOW_EQ", "LowEQ", NormalisableRange<float>(49.0f, 1000.0f, 1.0f), 49.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("HIGH_EQ", "HighEQ", NormalisableRange<float>(1999.0f, 10000.0f, 1.0f), 1999.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("FILTER", "Filter", NormalisableRange<float>(550.0f, 10000.0f, 50.0f), 500.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>("GAIN", "Gain", NormalisableRange<float>(-8.0f, 2.0f, 0.01f), -5.0f));
 
     return {params.begin(), params.end()};
 }
@@ -157,13 +155,13 @@ void Twisted_pluginAudioProcessor::prepareToPlay (double sampleRate, int samples
     reverbPercs.prepareSynthDSP(spec);
     bassBoost.prepareSynthDSP(spec);
 
-    stretcherSynth1 = std::make_unique<RubberBand::RubberBandStretcher> (sampleRate, getTotalNumOutputChannels(), RubberBand::RubberBandStretcher::Option::OptionProcessRealTime, 1, 1);
+    stretcherSynth1 = std::make_unique<RubberBand::RubberBandStretcher> (sampleRate, getTotalNumOutputChannels(), RubberBand::RubberBandStretcher::Option::OptionProcessRealTime, 1.0, 1.0);
     stretcherSynth1->reset();
-    stretcherSynth2 = std::make_unique<RubberBand::RubberBandStretcher> (sampleRate, getTotalNumOutputChannels(), RubberBand::RubberBandStretcher::Option::OptionProcessRealTime, 1, 1);
+    stretcherSynth2 = std::make_unique<RubberBand::RubberBandStretcher> (sampleRate, getTotalNumOutputChannels(), RubberBand::RubberBandStretcher::Option::OptionProcessRealTime, 1.0, 1.0);
     stretcherSynth2->reset();
-    stretcherSynth3 = std::make_unique<RubberBand::RubberBandStretcher> (sampleRate, getTotalNumOutputChannels(), RubberBand::RubberBandStretcher::Option::OptionProcessRealTime, 1, 1);
+    stretcherSynth3 = std::make_unique<RubberBand::RubberBandStretcher> (sampleRate, getTotalNumOutputChannels(), RubberBand::RubberBandStretcher::Option::OptionProcessRealTime, 1.0, 1.0);
     stretcherSynth3->reset();
-    stretcherSynth4 = std::make_unique<RubberBand::RubberBandStretcher> (sampleRate, getTotalNumOutputChannels(), RubberBand::RubberBandStretcher::Option::OptionProcessRealTime, 1, 1);
+    stretcherSynth4 = std::make_unique<RubberBand::RubberBandStretcher> (sampleRate, getTotalNumOutputChannels(), RubberBand::RubberBandStretcher::Option::OptionProcessRealTime, 1.0, 1.0);
     stretcherSynth4->reset();
 }
 
@@ -207,135 +205,16 @@ void Twisted_pluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
         buffer.clear (i, 0, buffer.getNumSamples());
     };
 
-    //PLAY KEYS OF KEYBOARD
+    ////PLAY KEYS OF KEYBOARD
     keyboardState.processNextMidiBuffer(midiMessages, 0, buffer.getNumSamples(), true);
 
-    //OCTAVE5
-    if(keyboardState.isNoteOn(1, C5note)){
-        if(!isNotePlayed1){
-            isNotePlayed1 = true;
-            myGetBPM();
-            stretcherSynth1->setPitchScale(1);
-            stretcherSynth1->setTimeRatio(stretchingRatio);
-            voiceSynth1->setSourceSamplePos0();}
-        playheadValue1 = voiceSynth1->getSourceSamplePos();}
-    else if(isNotePlayed1){
-        isNotePlayed1 = false;
-        playheadValue1 = 0;
-        stretcherSynth1->reset();}
+    auto stretchingRatio = getStretchingRatio();
 
-    if(keyboardState.isNoteOn(1, D5note)){
-        if(!isNotePlayed2){
-            isNotePlayed2 = true;
-            myGetBPM();
-            stretcherSynth2->setPitchScale(1);
-            stretcherSynth2->setTimeRatio(stretchingRatio);
-            voiceSynth2->setSourceSamplePos0();}
-        playheadValue2 = voiceSynth2->getSourceSamplePos();}
-    else if(isNotePlayed2){
-        isNotePlayed2 = false;
-        playheadValue2 = 0;
-        stretcherSynth2->reset();}
-
-    if(keyboardState.isNoteOn(1, E5note)){
-        if(!isNotePlayed3){
-            isNotePlayed3 = true;
-            myGetBPM();
-            stretcherSynth3->setPitchScale(1);
-            stretcherSynth3->setTimeRatio(stretchingRatio);
-            voiceSynth3->setSourceSamplePos0();}
-        playheadValue3 = voiceSynth3->getSourceSamplePos();}
-    else if(isNotePlayed3){
-        isNotePlayed3 = false;
-        playheadValue3 = 0;
-        stretcherSynth3->reset();}
-
-    if(keyboardState.isNoteOn(1, F5note)){
-        if(!isNotePlayed4){
-            isNotePlayed4 = true;
-            myGetBPM();
-            stretcherSynth4->setPitchScale(1);
-            stretcherSynth4->setTimeRatio(stretchingRatio);
-            voiceSynth4->setSourceSamplePos0();}
-        playheadValue4 = voiceSynth4->getSourceSamplePos();}
-    else if(isNotePlayed4){
-        isNotePlayed4 = false;
-        playheadValue4 = 0;
-        stretcherSynth4->reset();}
-
-    //OCTAVE4
-    if(keyboardState.isNoteOn(1, C4note)){
-        if(!isNotePlayed1D){
-            isNotePlayed1D = true;
-            myGetBPM();
-            stretcherSynth1->setPitchScale(0.5);
-            stretcherSynth1->setTimeRatio(stretchingRatio);
-            voiceSynth1->setSourceSamplePos0();}
-        playheadValue1 = voiceSynth1->getSourceSamplePos();}
-    else if(isNotePlayed1D){
-        isNotePlayed1D = false;
-        playheadValue1 = 0;
-        stretcherSynth1->reset();}
-
-    if(keyboardState.isNoteOn(1, D4note)){
-        if(!isNotePlayed2D){
-            isNotePlayed2D = true;
-            myGetBPM();
-            stretcherSynth2->setPitchScale(0.5);
-            stretcherSynth2->setTimeRatio(stretchingRatio);
-            voiceSynth2->setSourceSamplePos0();}
-        playheadValue2 = voiceSynth2->getSourceSamplePos();}
-    else if(isNotePlayed2D){
-        isNotePlayed2D = false;
-        playheadValue2 = 0;
-        stretcherSynth2->reset();}
-
-    if(keyboardState.isNoteOn(1, E4note)){
-        if(!isNotePlayed3D){
-            isNotePlayed3D = true;
-            myGetBPM();
-            stretcherSynth3->setPitchScale(0.5);
-            stretcherSynth3->setTimeRatio(stretchingRatio);
-            voiceSynth3->setSourceSamplePos0();}
-        playheadValue3 = voiceSynth3->getSourceSamplePos();}
-    else if(isNotePlayed3D){
-        isNotePlayed3D = false;
-        playheadValue3 = 0;
-        stretcherSynth3->reset();}
-
-    if(keyboardState.isNoteOn(1, F4note)){
-        if(!isNotePlayed4D){
-            isNotePlayed4D = true;
-            myGetBPM();
-            stretcherSynth4->setPitchScale(0.5);
-            stretcherSynth4->setTimeRatio(stretchingRatio);
-            voiceSynth4->setSourceSamplePos0();}
-        playheadValue4 = voiceSynth4->getSourceSamplePos();}
-    else if(isNotePlayed4D){
-        isNotePlayed4D = false;
-        playheadValue4 = 0;
-        stretcherSynth4->reset();}
-
-    //PLAY AND STOP BUTTONS
-    if(playButtonStarts)
-    {
-        keyboardState.noteOn(1, C5note, static_cast<uint8>(1));
-        keyboardState.noteOn(1, D5note, static_cast<uint8>(1));
-        keyboardState.noteOn(1, E5note, static_cast<uint8>(1));
-        keyboardState.noteOn(1, F5note, static_cast<uint8>(1));
-        isPlaying=true;
-        playButtonStarts=false;
-    }
-    if(stopButtonStarts)
-    {
-        isPlaying=false;
-        keyboardState.allNotesOff(1);
-        stretcherSynth1->reset();
-        stretcherSynth2->reset();
-        stretcherSynth3->reset();
-        stretcherSynth4->reset();
-        stopButtonStarts=false;
-    }
+    ////NOTES
+    checkNoteStatus(C3note, isNotePlayed1, *stretcherSynth1, *voiceSynth1, playheadValue1, stretchingRatio);
+    checkNoteStatus(D3note, isNotePlayed2, *stretcherSynth2, *voiceSynth2, playheadValue2, stretchingRatio);
+    checkNoteStatus(E3note, isNotePlayed3, *stretcherSynth3, *voiceSynth3, playheadValue3, stretchingRatio);
+    checkNoteStatus(F3note, isNotePlayed4, *stretcherSynth4, *voiceSynth4, playheadValue4, stretchingRatio);
 
     //PLAY SYNTHESISERS
     auto outputBufferSamples = buffer.getNumSamples();
@@ -404,6 +283,16 @@ void Twisted_pluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
     sliderValuePercs = apvts.getRawParameterValue("REVERB_PERCS")->load(); //Get value of slider
     reverbPercs.processSynthReverb(stretchBufferSynth4, sliderValuePercs); ; //Add channel effect to temporal stretch buffer
 
+    //Apply solo/mute to each buffer
+    if(playAllowed1) stretchBufferSynth1.applyGain(defaultGain);
+    else stretchBufferSynth1.applyGain(0);
+    if(playAllowed2) stretchBufferSynth2.applyGain(defaultGain);
+    else stretchBufferSynth2.applyGain(0);
+    if(playAllowed3) stretchBufferSynth3.applyGain(defaultGain);
+    else stretchBufferSynth3.applyGain(0);
+    if(playAllowed4) stretchBufferSynth4.applyGain(defaultGain);
+    else stretchBufferSynth4.applyGain(0);
+
     //Adding Temporal Stretch Buffers with effects to Buffer
     for (auto channel = 0; channel < buffer.getNumChannels(); channel++) {
 
@@ -414,8 +303,6 @@ void Twisted_pluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
     }
 
     outputEffects.processDSP(buffer); //Applying master effects
-
-    midiMessages.clear(); //Disable plugin to generate MIDI at its output
 }
 
 //==============================================================================
@@ -432,22 +319,83 @@ juce::AudioProcessorEditor* Twisted_pluginAudioProcessor::createEditor()
 //==============================================================================
 void Twisted_pluginAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+    auto state = apvts.copyState();
+
+    //SAVE APVTS DATA
+    /*std::unique_ptr<juce::XmlElement> xml (state.createXml());
+    copyXmlToBinary (*xml, destData);*/
+
+    //SAVE COMBOBOXES AND SOLOS DATA
+    auto switchNode = state.getOrCreateChildWithName ("myValues", nullptr);
+    switchNode.setProperty ("solo1", sv1, nullptr);
+    switchNode.setProperty ("solo2", sv2, nullptr);
+    switchNode.setProperty ("solo3", sv3, nullptr);
+    switchNode.setProperty ("solo4", sv4, nullptr);
+    switchNode.setProperty ("combobox1", cbv1, nullptr);
+    switchNode.setProperty ("combobox2", cbv2, nullptr);
+    switchNode.setProperty ("combobox3", cbv3, nullptr);
+    switchNode.setProperty ("combobox4", cbv4, nullptr);
+    //SAVE COMBOBOXES AND SOLOS DATA
+    switchNode.setProperty ("BOOST", knob1, nullptr);
+    switchNode.setProperty ("REVERB_SNR", knob2, nullptr);
+    switchNode.setProperty ("REVERB_HH", knob3, nullptr);
+    switchNode.setProperty ("REVERB_PERCS", knob4, nullptr);
+    switchNode.setProperty ("LOW_EQ", knob5, nullptr);
+    switchNode.setProperty ("HIGH_EQ", knob6, nullptr);
+    switchNode.setProperty ("FILTER", knob7, nullptr);
+    switchNode.setProperty ("GAIN", knob8, nullptr);
+
+    MemoryOutputStream stream(destData, false);
+    state.writeToStream (stream);
 }
 
 void Twisted_pluginAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+    //LOAD APVTS DATA
+    /*   std::unique_ptr<juce::XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
+
+           if (xmlState.get() != nullptr)
+               if (xmlState->hasTagName (apvts.state.getType()))
+                   apvts.replaceState (juce::ValueTree::fromXml (*xmlState));*/
+
+    auto state = apvts.copyState();
+
+    //LOAD COMBOBOXES AND SOLOS DATA
+    ValueTree tree = ValueTree::readFromData (data, size_t (sizeInBytes));
+    if (tree.isValid())
+    {
+        state = tree;
+        auto switchNode = state.getChildWithName ("myValues");
+        if (switchNode.isValid())
+        {
+            if(switchNode.hasProperty ("solo1")) sv1 = switchNode.getProperty ("solo1");
+            if(switchNode.hasProperty ("solo2")) sv2 = switchNode.getProperty ("solo2");
+            if(switchNode.hasProperty ("solo3")) sv3 = switchNode.getProperty ("solo3");
+            if(switchNode.hasProperty ("solo4")) sv4 = switchNode.getProperty ("solo4");
+            if(switchNode.hasProperty ("combobox1")) cbv1 = switchNode.getProperty ("combobox1");
+            if(switchNode.hasProperty ("combobox2")) cbv2 = switchNode.getProperty ("combobox2");
+            if(switchNode.hasProperty ("combobox3")) cbv3 = switchNode.getProperty ("combobox3");
+            if(switchNode.hasProperty ("combobox4")) cbv4 = switchNode.getProperty ("combobox4");
+            if(switchNode.hasProperty ("BOOST")) knob1 = switchNode.getProperty ("BOOST");
+            if(switchNode.hasProperty ("REVERB_SNR")) knob2 = switchNode.getProperty ("REVERB_SNR");
+            if(switchNode.hasProperty ("REVERB_HH")) knob3 = switchNode.getProperty ("REVERB_HH");
+            if(switchNode.hasProperty ("REVERB_PERCS")) knob4 = switchNode.getProperty ("REVERB_PERCS");
+            if(switchNode.hasProperty ("LOW_EQ")) knob5 = switchNode.getProperty ("LOW_EQ");
+            if(switchNode.hasProperty ("HIGH_EQ")) knob6 = switchNode.getProperty ("HIGH_EQ");
+            if(switchNode.hasProperty ("FILTER")) knob7 = switchNode.getProperty ("FILTER");
+            if(switchNode.hasProperty ("GAIN")) knob8 = switchNode.getProperty ("GAIN");
+        }
+    }
+
+
 }
 
-//PRIVATE CUSTOM FUNCTIONS
+//LOAD FILES FUNCTIONS
 //Read the file
-void Twisted_pluginAudioProcessor::loadAFile(const File& file, int& varInt, int varSource)
+void Twisted_pluginAudioProcessor::loadAFile(const File& file, int& varInt,  int comboBoxInt)
 {
-    myAudioLoadedBy(varInt, varSource);
+    myStop();
+    if(comboBoxInt==0) { prepareCleanerCombobox(varInt); }
     mySynthSelected(varInt)->clearSounds();
 
     varFormatReader = varFormatManager.createReaderFor(file);
@@ -456,31 +404,55 @@ void Twisted_pluginAudioProcessor::loadAFile(const File& file, int& varInt, int 
     varFormatReader->read (myAudioBuffer(varInt),0,sampleLenght, 0, true, false);
 
     mySoundToSynth(varInt);
-    stopButtonStarts=true;
     buttonsResetProcess=true;
 }
 
-//Identify the source of the sample (1-drag, 2-combobox) according to the last element used on GUI.
-void Twisted_pluginAudioProcessor::myAudioLoadedBy(int& varInt, int varInt2)
+//Prepare cleaning of a bombobox
+void Twisted_pluginAudioProcessor::prepareCleanerCombobox(int& varInt)
 {
     switch(varInt)
     {
         case 1:
-            audio1LoadedBy = varInt2;
+            cbcleaner1=true;
             break;
         case 2:
-            audio2LoadedBy = varInt2;
+            cbcleaner2=true;
             break;
         case 3:
-            audio3LoadedBy = varInt2;
+            cbcleaner3=true;
             break;
         case 4:
-            audio4LoadedBy = varInt2;
+            cbcleaner4=true;
             break;
         default:
-            audio1LoadedBy = varInt2;
             break;
     }
+}
+
+//Trigger cleaning of a bombobox
+int Twisted_pluginAudioProcessor::triggerCleanerCombobox()
+{
+    if(cbcleaner1)
+    {
+        cbcleaner1=false;
+        return 1;
+    }
+    if(cbcleaner2)
+    {
+        cbcleaner2=false;
+        return 2;
+    }
+    if(cbcleaner3)
+    {
+        cbcleaner3=false;
+        return 3;
+    }
+    if(cbcleaner4)
+    {
+        cbcleaner4=false;
+        return 4;
+    }
+    return 0;
 }
 
 //Select the synth in accordance with the last element used on GUI
@@ -496,9 +468,8 @@ Synthesiser* Twisted_pluginAudioProcessor::mySynthSelected(int& varInt)
             return &varSynthesiser3;
         case 4:
             return &varSynthesiser4;
-        default:
-            return &varSynthesiser1;
     }
+    return nullptr;
 }
 
 //Select the audioBuffer in accord with the last element used on GUI
@@ -514,9 +485,8 @@ AudioBuffer<float>* Twisted_pluginAudioProcessor::myAudioBuffer(int& varInt)
             return &varAudioBuffer3;
         case 4:
             return &varAudioBuffer4;
-        default:
-            return &varAudioBuffer1;
     }
+    return nullptr;
 }
 
 //Assign the customSamplerSound to the corresponding Synthesiser
@@ -526,33 +496,46 @@ void Twisted_pluginAudioProcessor::mySoundToSynth(int& varInt)
     switch(varInt)
     {
         case 1:
-            customSamplerSound1 = new CustomSamplerSound(nameString, *varFormatReader, range1, C5note, 0.1, 0.1, 10.0);
+            customSamplerSound1 = new CustomSamplerSound(nameString, *varFormatReader, range1, C3note, 0.1, 0.1, 10.0);
             mySynthSelected(varInt)->addSound(customSamplerSound1);
-            customSamplerSound1D = new CustomSamplerSound(nameString, *varFormatReader, range1D, C4note, 0.1, 0.1, 10.0);
-            mySynthSelected(varInt)->addSound(customSamplerSound1D);
             break;
         case 2:
-            customSamplerSound2 = new CustomSamplerSound(nameString, *varFormatReader, range2, D5note, 0.1, 0.1, 10.0);
+            customSamplerSound2 = new CustomSamplerSound(nameString, *varFormatReader, range2, D3note, 0.1, 0.1, 10.0);
             mySynthSelected(varInt)->addSound(customSamplerSound2);
-            customSamplerSound2D = new CustomSamplerSound(nameString, *varFormatReader, range2D, D4note, 0.1, 0.1, 10.0);
-            mySynthSelected(varInt)->addSound(customSamplerSound2D);
             break;
         case 3:
-            customSamplerSound3 = new CustomSamplerSound(nameString, *varFormatReader, range3, E5note, 0.1, 0.1, 10.0);
+            customSamplerSound3 = new CustomSamplerSound(nameString, *varFormatReader, range3, E3note, 0.1, 0.1, 10.0);
             mySynthSelected(varInt)->addSound(customSamplerSound3);
-            customSamplerSound3D = new CustomSamplerSound(nameString, *varFormatReader, range3D, E4note, 0.1, 0.1, 10.0);
-            mySynthSelected(varInt)->addSound(customSamplerSound3D);
             break;
         case 4:
-            customSamplerSound4 = new CustomSamplerSound(nameString, *varFormatReader, range4, F5note, 0.1, 0.1, 10.0);
+            customSamplerSound4 = new CustomSamplerSound(nameString, *varFormatReader, range4, F3note, 0.1, 0.1, 10.0);
             mySynthSelected(varInt)->addSound(customSamplerSound4);
-            customSamplerSound4D = new CustomSamplerSound(nameString, *varFormatReader, range4D, F4note, 0.1, 0.1, 10.0);
-            mySynthSelected(varInt)->addSound(customSamplerSound4D);
             break;
     }
 }
 
-//Controls the synths thath have perrmission to be listened according to the solo buttons (turned off/turned on)
+//BUTTONS FUNCTIONS
+//Buttons Play & Stop
+void Twisted_pluginAudioProcessor::myPlay()
+{
+    keyboardState.noteOn(1, C3note, defaultGain);
+    keyboardState.noteOn(1, D3note, defaultGain);
+    keyboardState.noteOn(1, E3note, defaultGain);
+    keyboardState.noteOn(1, F3note, defaultGain);
+    isPlaying=true;
+}
+
+void Twisted_pluginAudioProcessor::myStop()
+{
+    isPlaying=false;
+    keyboardState.allNotesOff(1);
+    stretcherSynth1->reset();
+    stretcherSynth2->reset();
+    stretcherSynth3->reset();
+    stretcherSynth4->reset();
+}
+
+//Update Solo functionality
 void Twisted_pluginAudioProcessor::mySoloUpdate(int& varInt, bool varBool)
 {
     if(allSolosDisabled)
@@ -588,27 +571,23 @@ void Twisted_pluginAudioProcessor::mySoloUpdate(int& varInt, bool varBool)
         playAllowed4=true;
         allSolosDisabled=true;
     }
-
-    if(playAllowed1) voiceSynth1->setVelocity(defaultGain);
-    else voiceSynth1->setVelocity(0);
-    if(playAllowed2) voiceSynth2->setVelocity(defaultGain);
-    else voiceSynth2->setVelocity(0);
-    if(playAllowed3) voiceSynth3->setVelocity(defaultGain);
-    else voiceSynth3->setVelocity(0);
-    if(playAllowed4) voiceSynth4->setVelocity(defaultGain);
-    else voiceSynth4->setVelocity(0);
 }
 
-//Buttons Play & Stop
-void Twisted_pluginAudioProcessor::myPlay()
+//Reset play and stop buttons
+void Twisted_pluginAudioProcessor::checkIfReset()
 {
-    playButtonStarts=true;
-}
-void Twisted_pluginAudioProcessor::myStop()
-{
-    stopButtonStarts=true;
+    if(!keyboardState.isNoteOn(1, 84) &&
+       !keyboardState.isNoteOn(1, 86) &&
+       !keyboardState.isNoteOn(1, 88) &&
+       !keyboardState.isNoteOn(1, 89) )
+    {
+        isPlaying = false;
+        buttonsResetProcess = true;
+    }
 }
 
+//WAVEFORMS FUNCTIONS
+//Check if a sample was loaded
 bool Twisted_pluginAudioProcessor::mySamplerSoundExists(int& varInt)
 {
     switch(varInt)
@@ -633,50 +612,8 @@ bool Twisted_pluginAudioProcessor::mySamplerSoundExists(int& varInt)
                 return true;
             else
                 return false;
-        default:
-            return false;
     }
-}
-
-//Gets data of AudioLoadedBy variable, which indicates the sample source
-int Twisted_pluginAudioProcessor::myGetAudioLoadedBy(int& varInt)
-{
-    switch(varInt)
-    {
-        case 1:
-            return audio1LoadedBy;
-        case 2:
-            return audio2LoadedBy;
-        case 3:
-            return audio3LoadedBy;
-        case 4:
-            return audio4LoadedBy;
-        default:
-            return audio1LoadedBy;
-    }
-}
-
-//Sets data of AudioLoadedBy variable, which indicates the sample source
-void Twisted_pluginAudioProcessor::mySetAudioLoadedBy(int& varInt, int varInt2)
-{
-    switch(varInt)
-    {
-        case 1:
-            audio1LoadedBy = varInt2;
-            break;
-        case 2:
-            audio2LoadedBy = varInt2;
-            break;
-        case 3:
-            audio3LoadedBy = varInt2;
-            break;
-        case 4:
-            audio4LoadedBy = varInt2;
-            break;
-        default:
-            audio1LoadedBy = varInt2;
-            break;
-    }
+    return false;
 }
 
 //Gets playhead value in accordance with the corresponding synth
@@ -692,19 +629,201 @@ std::atomic<int>& Twisted_pluginAudioProcessor::myGetPlayheadValue(int& varInt)
             return playheadValue3;
         case 4:
             return playheadValue4;
-        default:
-            return playheadValue1;
+    }
+    return playheadValue1;
+}
+
+//Check the name of current sample, if is different it will paint a new soundwave
+String Twisted_pluginAudioProcessor::getSampleName(int& varInt)
+{
+    switch(varInt)
+    {
+        case 1:
+            return customSamplerSound1->getName();
+        case 2:
+            return customSamplerSound2->getName();
+        case 3:
+            return customSamplerSound3->getName();
+        case 4:
+            return customSamplerSound4->getName();
+    }
+    return "";
+}
+
+//KEYBOARD AND STRETCHING FUNCTIONS
+//Get stretching ratio reading BPM
+double Twisted_pluginAudioProcessor::getStretchingRatio()
+{
+    if (auto playHead = this->getPlayHead())
+    {
+        juce::AudioPlayHead::CurrentPositionInfo positionInfo;
+        playHead->getCurrentPosition(positionInfo);
+
+        auto ratio = 75.0 / static_cast<double>(positionInfo.bpm);
+
+        return ratio;
+    }
+
+    return 1.0;
+}
+
+//Check status of pressed notes
+void Twisted_pluginAudioProcessor::checkNoteStatus(int note, std::atomic<bool>& isNotePlayed, RubberBand::RubberBandStretcher& stretcher, CustomSamplerVoice& voice, std::atomic<int>& playHeadValue, double stretchingRatio)
+{
+    if (keyboardState.isNoteOn(1, note))
+    {
+        if (!isNotePlayed)
+        {
+            isNotePlayed = true;
+            stretcher.setTimeRatio(stretchingRatio);
+            voice.setSourceSamplePos0();
+        }
+
+        playHeadValue = voice.getSourceSamplePos();
+
+        return;
+    }
+
+    if (isNotePlayed)
+    {
+        isNotePlayed = false;
+        playHeadValue = 0;
+        stretcher.reset();
+        checkIfReset();
     }
 }
 
-//BPM
-void Twisted_pluginAudioProcessor::myGetBPM()
+//REOPEN WINDOW FUNCTIONS
+//Get Combobox info if Paint is destroyed
+int Twisted_pluginAudioProcessor::getComboBoxInfo(int varInt)
 {
-    playHead = this->getPlayHead();
-    playHead->getCurrentPosition (currentPositionInfo);
-    stretchingRatio=130/currentPositionInfo.bpm;
+    switch(varInt)
+    {
+        case 1:
+            return cbv1;
+        case 2:
+            return cbv2;
+        case 3:
+            return cbv3;
+        case 4:
+            return cbv4;
+    }
+    return 0;
 }
 
+//Set Combobox info if Paint is destroyed
+void Twisted_pluginAudioProcessor::setComboBoxInfo(int varInt, int varInt2)
+{
+    switch(varInt)
+    {
+        case 1:
+            cbv1 = varInt2;
+            break;
+        case 2:
+            cbv2 = varInt2;
+            break;
+        case 3:
+            cbv3 = varInt2;
+            break;
+        case 4:
+            cbv4 = varInt2;
+            break;
+    }
+}
+
+//Get Solo info if Paint is destroyed
+bool Twisted_pluginAudioProcessor::getSoloInfo(int varInt)
+{
+    switch(varInt)
+    {
+        case 1:
+            return sv1;
+        case 2:
+            return sv2;
+        case 3:
+            return sv3;
+        case 4:
+            return sv4;
+    }
+    return false;
+}
+
+//Set Solo info if Paint is destroyed
+void Twisted_pluginAudioProcessor::setSoloInfo(int varInt, bool varBool)
+{
+    switch(varInt)
+    {
+        case 1:
+            sv1 = varBool;
+            break;
+        case 2:
+            sv2 = varBool;
+            break;
+        case 3:
+            sv3 = varBool;
+            break;
+        case 4:
+            sv4 = varBool;
+            break;
+    }
+}
+
+//Get APVTS info if Paint is destroyed
+double Twisted_pluginAudioProcessor::getAPVTSInfo(int varInt)
+{
+    switch(varInt)
+    {
+        case 1:
+            return knob1;
+        case 2:
+            return knob2;
+        case 3:
+            return knob3;
+        case 4:
+            return knob4;
+        case 5:
+            return knob5;
+        case 6:
+            return knob6;
+        case 7:
+            return knob7;
+        case 8:
+            return knob8;
+    }
+    return false;
+}
+
+//Set APVTS info if Paint is destroyed
+void Twisted_pluginAudioProcessor::setAPVTSInfo(int varInt, double varDouble)
+{
+    switch(varInt)
+    {
+        case 1:
+            knob1 = varDouble;
+            break;
+        case 2:
+            knob2 = varDouble;
+            break;
+        case 3:
+            knob3 = varDouble;
+            break;
+        case 4:
+            knob4 = varDouble;
+            break;
+        case 5:
+            knob5 = varDouble;
+            break;
+        case 6:
+            knob6 = varDouble;
+            break;
+        case 7:
+            knob7 = varDouble;
+            break;
+        case 8:
+            knob8 = varDouble;
+            break;
+    }
+}
 //==============================================================================
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()

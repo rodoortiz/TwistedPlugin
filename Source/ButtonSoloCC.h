@@ -27,11 +27,11 @@ public:
     void resized() override;
     
     void setDrumSamplerType(int varInt);
-    void aSampleIsLoaded();
+    
+    TextButton varTextButton { "" };
     
 private:
     int drumSamplerType=0;
-    TextButton varTextButton { "" };
     
     Twisted_pluginAudioProcessor& audioProcessor;
     

@@ -64,8 +64,8 @@ void CustomSamplerVoice::startNote (int midiNoteNumber, float velocity, Synthesi
         
         sourceSamplePosition = 0.0;
 
-//        lgain = velocity;
-//        rgain = velocity;
+        lgain = velocity;
+        rgain = velocity;
 
         adsr.setSampleRate (sound->sourceSampleRate);
         adsr.setParameters (sound->params);
@@ -119,7 +119,7 @@ void CustomSamplerVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int 
 
             l *= lgain * envelopeValue;
             r *= rgain * envelopeValue;
-
+            
             if (outR != nullptr)
             {
                 *outL++ += l;

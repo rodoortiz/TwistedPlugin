@@ -36,36 +36,39 @@ std::vector<std::unique_ptr<WaveFormCC>> WaveFormCC::createObjects(Twisted_plugi
 
 void WaveFormCC::paint (juce::Graphics& g)
 {
-    g.fillAll(Colours::darkgrey.darker());
-    
-    //DRAG AND DROP
-    AudioBuffer<float> waveform = *audioProcessor.myAudioBuffer(drumSamplerType);
-
     if(audioProcessor.mySamplerSoundExists(drumSamplerType))
     {
-        Path p;
-        mAudioPoints.clear();
-        
-        auto ratio = waveform.getNumSamples()/getWidth();
-        auto buffer = waveform.getReadPointer(0);
-        
-        //scale audio file to window on x axis
-        for(int sample = 0; sample < waveform.getNumSamples(); sample+=ratio)
+        if(audioProcessor.getSampleName(drumSamplerType)!=currentName)
         {
-            mAudioPoints.push_back (buffer[sample]);
+            g.fillAll(Colours::darkgrey.darker());
+            
+            //DRAG AND DROP
+            AudioBuffer<float> waveform = *audioProcessor.myAudioBuffer(drumSamplerType);
+            
+            Path p;
+            mAudioPoints.clear();
+            
+            auto ratio = waveform.getNumSamples()/getWidth();
+            auto buffer = waveform.getReadPointer(0);
+            
+            //scale audio file to window on x axis
+            for(int sample = 0; sample < waveform.getNumSamples(); sample+=ratio)
+            {
+                mAudioPoints.push_back (buffer[sample]);
+            }
+            
+            g.setColour(Colours::cadetblue.brighter());
+            p.startNewSubPath(0, getHeight()/2);
+            
+            //scale audio file to window on y axis
+            for(int sample = 0; sample < mAudioPoints.size(); ++sample)
+            {
+                auto point = jmap<float> (mAudioPoints[sample], -1.0f, 1.0f, getHeight(), 0);
+                p.lineTo (sample, point);
+            }
+            
+            g.strokePath(p, PathStrokeType(2));
         }
-        
-        g.setColour(Colours::cadetblue.brighter());
-        p.startNewSubPath(0, getHeight()/2);
-        
-        //scale audio file to window on y axis
-        for(int sample = 0; sample < mAudioPoints.size(); ++sample)
-        {
-            auto point = jmap<float> (mAudioPoints[sample], -1.0f, 1.0f, getHeight(), 0);
-            p.lineTo (sample, point);
-        }
-        
-        g.strokePath(p, PathStrokeType(2));
         
         //PLAYHEAD
         auto playHeadPosition = jmap<int> (audioProcessor.myGetPlayheadValue(drumSamplerType), 0, audioProcessor.myAudioBuffer(drumSamplerType)->getNumSamples(), 0, getWidth());
@@ -77,6 +80,8 @@ void WaveFormCC::paint (juce::Graphics& g)
     }
     else
     {
+        g.fillAll(Colours::darkgrey.darker());
+        
         g.setColour(Colours::white);
         g.setFont(20.0f);
         g.drawFittedText("Load Sample", getLocalBounds(), Justification::centred, 1);
@@ -107,7 +112,7 @@ void WaveFormCC::filesDropped (const StringArray& files, int x, int y)
         if (isInterestedInFileDrag(files))
         {  
             auto theFile = File(file);
-            audioProcessor.loadAFile(theFile, drumSamplerType, 1);
+            audioProcessor.loadAFile(theFile, drumSamplerType, 0);
         }
     }
     

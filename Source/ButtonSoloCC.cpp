@@ -28,7 +28,6 @@ ButtonSoloCC::ButtonSoloCC(Twisted_pluginAudioProcessor& p) : audioProcessor(p)
     varTextButton.setColour (TextButton::textColourOffId, Colours::black);
     varTextButton.setColour (TextButton::textColourOnId, Colours::yellow);
     varTextButton.setToggleState(false, dontSendNotification);
-    varTextButton.setEnabled(false);
     addAndMakeVisible(varTextButton);
 }
 
@@ -51,10 +50,7 @@ std::vector<std::unique_ptr<ButtonSoloCC>> ButtonSoloCC::createObjects(Twisted_p
 
 void ButtonSoloCC::paint (juce::Graphics& g)
 {
-    if(audioProcessor.mySamplerSoundExists(drumSamplerType))
-    {
-        aSampleIsLoaded();
-    }
+
 }
 
 void ButtonSoloCC::resized()
@@ -66,9 +62,4 @@ void ButtonSoloCC::resized()
 void ButtonSoloCC::setDrumSamplerType(int varInt)
 {
     drumSamplerType = varInt;
-}
-
-void ButtonSoloCC::aSampleIsLoaded()
-{
-    varTextButton.setEnabled(true);
 }

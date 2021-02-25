@@ -1,0 +1,2 @@
+\\Mac\Home\Documents\Development\rubberband-1.9.0\x64\Debug\rubberband-library.lib
+\\Mac\Home\Documents\Development\rubberband-1.9.0\x64\Debug\rubberband-library.pdb

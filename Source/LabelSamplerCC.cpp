@@ -52,3 +52,41 @@ void LabelSamplerCC::resized()
 {
     drumSampleLabel.setBoundsRelative(0, 0, 1, 1);
 }
+
+//==============================================================================
+
+LabelsEffects::LabelsEffects(Twisted_pluginAudioProcessor& p) : audioProcessor(p)
+{
+    effectLabel.setJustificationType(Justification::centred);
+    effectLabel.setFont(Font(12.0f, Font::FontStyleFlags::plain));
+    addAndMakeVisible(effectLabel);
+}
+
+LabelsEffects::~LabelsEffects()
+{
+}
+
+std::vector<std::unique_ptr<LabelsEffects>> LabelsEffects::createObjects(Twisted_pluginAudioProcessor& p)
+{
+    auto v = std::vector<std::unique_ptr<LabelsEffects>>();
+
+    for (auto i = 0; i < 4; i++)
+    {
+        v.emplace_back(std::make_unique<LabelsEffects>(p));
+        if(i==0)
+            v[i]->setLabelsEffects("BOOST");
+        if(i==1)
+            v[i]->setLabelsEffects("REVERB");
+        if(i==2)
+            v[i]->setLabelsEffects("REVERB");
+        if(i==3)
+            v[i]->setLabelsEffects("REVERB");
+    };
+
+    return v;
+}
+
+void LabelsEffects::resized()
+{
+    effectLabel.setBoundsRelative(0, 0, 1, 1);
+}

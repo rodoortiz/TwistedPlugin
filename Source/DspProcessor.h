@@ -37,9 +37,6 @@ private:
 
 class SynthProcessor {
 public:
-//    SynthProcessor();
-//    ~SynthProcessor();
-    
     void prepareSynthDSP(const dsp::ProcessSpec& spec);
     void processSynthReverb(AudioBuffer<float>& buffer, float& sliderValue);
     void processSynthBoost(AudioBuffer<float>& buffer, float& sliderValue);

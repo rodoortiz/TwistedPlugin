@@ -20,6 +20,7 @@
 #include <array>
 #include "ReverbAndBoostSlider.h"
 #include "MasterSliders.h"
+#include "LoginComponent.h"
 
 //==============================================================================
 /**
@@ -36,6 +37,7 @@ public:
     void resized() override;
     
     void timerCallback() override;
+    int getMyTime();
         
 private:
     Image imagen, logo;
@@ -44,6 +46,7 @@ private:
     std::vector<std::unique_ptr<WaveFormCC>> waveForms;
     std::vector<std::unique_ptr<ComboBoxCC>> comboBoxes;
     std::vector<std::unique_ptr<LabelSamplerCC>> labelSamplers;
+    std::vector<std::unique_ptr<LabelsEffects>> labelsEffects;
     std::vector<std::unique_ptr<ButtonSoloCC>> buttonSolos;
     std::vector<std::unique_ptr<ReverbAndBoostSlider>> sliders;
     MasterSliders masterSliders;
@@ -57,6 +60,7 @@ private:
     
     float waveFormxPos = 0.025f;
     float labelSamplerXpos = 0.325f;
+    float labelEffectsXpos = 0.68f;
     float buttonSoloXpos = 0.425f;
     float comboBoxXpos = 0.4625f;
     float reverbSliderXpos = 0.68f;
@@ -66,6 +70,8 @@ private:
     ButtonStopCC buttonStopCC;
     
     MidiKeyboard keyboardComponent;
+    
+    LoginComponent loginComponent;
     
     Twisted_pluginAudioProcessor& audioProcessor;
     

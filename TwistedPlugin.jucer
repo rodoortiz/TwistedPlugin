@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="UYuHPm" name="TwistedPlugin" projectType="audioplug" useAppConfig="1"
-              addUsingNamespaceToJuceHeader="1" displaySplashScreen="0" jucerFormatVersion="1"
-              pluginCharacteristicsValue="pluginIsSynth,pluginProducesMidiOut,pluginWantsMidiIn"
-              companyName="Sample House" headerPath="/Users/rodolfoortiz/Documents/JUCE_Costumers/TwistedPlugin/Rubberband">
+              addUsingNamespaceToJuceHeader="1" jucerFormatVersion="1" pluginCharacteristicsValue="pluginIsSynth,pluginProducesMidiOut,pluginWantsMidiIn"
+              companyName="Sample House" headerPath="../../Rubberband">
   <MAINGROUP id="GHzs4l" name="TwistedPlugin">
     <GROUP id="{90D450FC-DA0F-558D-A395-DC16EE504A16}" name="Source">
       <FILE id="tCGdNQ" name="ButtonLookAndFeel.h" compile="0" resource="0"
@@ -52,6 +51,13 @@
       <FILE id="tCgd02" name="WaveFormCC.cpp" compile="1" resource="0" file="Source/WaveFormCC.cpp"/>
       <FILE id="eZVhz6" name="WaveFormCC.h" compile="0" resource="0" file="Source/WaveFormCC.h"/>
     </GROUP>
+    <GROUP id="{1C88C1FC-A2C0-30D8-CF9A-B4602D0E2ECF}" name="Authorization">
+      <FILE id="IuiTQC" name="LoginComponent.cpp" compile="1" resource="0"
+            file="Source/LoginComponent.cpp"/>
+      <FILE id="nGkQ3A" name="LoginComponent.h" compile="0" resource="0"
+            file="Source/LoginComponent.h"/>
+      <FILE id="Uqu6BH" name="RestRequest.h" compile="0" resource="0" file="Source/RestRequest.h"/>
+    </GROUP>
     <GROUP id="{D6F24137-D80E-2FB1-8496-71EE7BEB8D87}" name="Resources">
       <FILE id="giW0Ur" name="Knob_example.png" compile="0" resource="1"
             file="Resources/Knob_example.png"/>
@@ -62,7 +68,7 @@
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
   <EXPORTFORMATS>
-    <XCODE_MAC targetFolder="Builds/MacOSX" extraLinkerFlags="/Users/rodolfoortiz/Documents/JUCE_Costumers/TwistedPlugin/Rubberband/lib/librubberband.a">
+    <XCODE_MAC targetFolder="Builds/MacOSX" extraLinkerFlags="../../Rubberband/lib/MacOS/librubberband.a">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" targetName="TwistedPlugin"/>
         <CONFIGURATION isDebug="0" name="Release" targetName="TwistedPlugin"/>
@@ -83,6 +89,29 @@
         <MODULEPATH id="juce_gui_extra" path="../../../../../Applications/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
+    <VS2019 targetFolder="Builds/VisualStudio2019" externalLibraries="rubberband-library.lib">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" headerPath="..\..\Rubberband" libraryPath="..\..\Rubberband\lib\Windows\Debug\"
+                       enablePluginBinaryCopyStep="1"/>
+        <CONFIGURATION isDebug="0" name="Release" headerPath="..\..\Rubberband" libraryPath="..\..\Rubberband\lib\Windows\Release\"
+                       enablePluginBinaryCopyStep="1"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_gui_extra"/>
+        <MODULEPATH id="juce_gui_basics"/>
+        <MODULEPATH id="juce_graphics"/>
+        <MODULEPATH id="juce_events"/>
+        <MODULEPATH id="juce_dsp"/>
+        <MODULEPATH id="juce_data_structures"/>
+        <MODULEPATH id="juce_core"/>
+        <MODULEPATH id="juce_audio_utils"/>
+        <MODULEPATH id="juce_audio_processors"/>
+        <MODULEPATH id="juce_audio_plugin_client"/>
+        <MODULEPATH id="juce_audio_formats"/>
+        <MODULEPATH id="juce_audio_devices"/>
+        <MODULEPATH id="juce_audio_basics"/>
+      </MODULEPATHS>
+    </VS2019>
   </EXPORTFORMATS>
   <MODULES>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>

@@ -17,7 +17,6 @@ MasterOutputProcessor::~MasterOutputProcessor() {
 }
 
 void MasterOutputProcessor::prepareDSP(const dsp::ProcessSpec& spec) {
-    
     dspChain.prepare(spec);
     
     //Initialize Filter as Lowpass
@@ -67,12 +66,6 @@ void MasterOutputProcessor::updateDspChain() {
 
 //==============================================================================
 
-//SynthProcessor::SynthProcessor() {
-//}
-//
-//SynthProcessor::~SynthProcessor() {
-//}
-
 void SynthProcessor::prepareSynthDSP(const dsp::ProcessSpec& spec) {
     reverb.prepare(spec);
     bassBoost.prepare(spec);
@@ -81,8 +74,8 @@ void SynthProcessor::prepareSynthDSP(const dsp::ProcessSpec& spec) {
 
 void SynthProcessor::processSynthReverb(AudioBuffer<float> &buffer, float& sliderValue) {
     
-    reverbParameters.dryLevel = 1 - sliderValue;
-    reverbParameters.wetLevel = sliderValue;
+    reverbParameters.dryLevel = 1 - (sliderValue/100.0f);
+    reverbParameters.wetLevel = (sliderValue/100.0f);
     reverb.setParameters(reverbParameters);
     
     auto audioBlock = dsp::AudioBlock<float> (buffer);

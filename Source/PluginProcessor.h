@@ -56,23 +56,34 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    void loadAFile(const File& file, int& varInt, int varSource);
+    //LOAD FILES FUNCTIONS
+    void loadAFile(const File& file, int& varInt, int comboBoxInt);
+    void prepareCleanerCombobox(int& varInt);
+    int triggerCleanerCombobox();
     Synthesiser* mySynthSelected(int& varInt);
     AudioBuffer<float>* myAudioBuffer(int& varInt);
-    void mySampleNameSelected(int& varInt, String& varString);
-    void myAudioLoadedBy(int& varInt, int varInt2);
-    void mySoloUpdate(int& varInt, bool varBool);
+    void mySoundToSynth(int& varInt);
+    //BUTTONS FUNCTIONS
     void myPlay();
     void myStop();
+    void mySoloUpdate(int& varInt, bool varBool);
+    void checkIfReset();
+    //WAVEFORMS FUNCTIONS
     bool mySamplerSoundExists(int& varInt);
-    int myGetAudioLoadedBy(int& varInt);
-    void mySetAudioLoadedBy(int& varInt, int varInt2);
-    void mySoundToSynth(int& varInt);
     std::atomic<int>& myGetPlayheadValue(int& varInt);
-    void myGetBPM();
+    String getSampleName(int& varInt);
+    //KEYBOARD AND STRETCHING FUNCTIONS
+    double getStretchingRatio();
+    void checkNoteStatus(int note, std::atomic<bool>& isNotePlayed, RubberBand::RubberBandStretcher& stretcher, CustomSamplerVoice& voice, std::atomic<int>& playHeadValue, double stretcherRatio);
 
-    AudioBuffer<float> varAudioBuffer1, varAudioBuffer2, varAudioBuffer3, varAudioBuffer4;
-    bool isPlaying, buttonsResetProcess;
+    //REOPEN WINDOW FUNCTIONS
+    int getComboBoxInfo(int varInt);
+    void setComboBoxInfo(int varInt, int varInt2);
+    bool getSoloInfo(int varInt);
+    void setSoloInfo(int varInt, bool varBool);
+    double getAPVTSInfo(int varInt);
+    void setAPVTSInfo(int varInt, double varDouble);
+
 
     //MidiKeyboard
     MidiKeyboardState keyboardState;
@@ -81,41 +92,36 @@ public:
     //DSP
     SynthProcessor reverbSnr, reverbHH, reverbPercs, bassBoost;
     MasterOutputProcessor outputEffects;
+    //Let the editor know if it has to reset buttons
+    bool buttonsResetProcess;
 
 private:
-    //Sample source indicators
-    int audio1LoadedBy = 0, audio2LoadedBy = 0, audio3LoadedBy = 0, audio4LoadedBy = 0;
+    //To know if play button is playing
+    bool isPlaying;
     //Play allowed indicators
     bool playAllowed1=true, playAllowed2=true, playAllowed3=true, playAllowed4=true;
     //All solos disabled indicator
     bool allSolosDisabled=true;
-    //Play and Stop controls
-    bool playButtonStarts, stopButtonStarts;
     //Synthesisers ranges and notes
-    int C5note=84, D5note=86, E5note=88, F5note=89;
-    int C4note=72, D4note=74, E4note=76, F4note=77;
+    int C3note=60, D3note=62, E3note=64, F3note=65;
     BigInteger range1, range2, range3, range4;
-    BigInteger range1D, range2D, range3D, range4D;
-    //Default Gain
+    //Default Gains
     float defaultGain = 0.75f;
     //Channels Sliders values
     float sliderValueBoost{0}, sliderValueSnr{0}, sliderValueHH{0}, sliderValuePercs{0};
+    //Comboboxes Cleaners
+    bool cbcleaner1=false, cbcleaner2=false, cbcleaner3=false, cbcleaner4=false;
 
     std::atomic<int> playheadValue1 { 0 };
     std::atomic<int> playheadValue2 { 0 };
     std::atomic<int> playheadValue3 { 0 };
     std::atomic<int> playheadValue4 { 0 };
-    bool isNotePlayed1, isNotePlayed2, isNotePlayed3, isNotePlayed4;
-    bool isNotePlayed1D, isNotePlayed2D, isNotePlayed3D, isNotePlayed4D;
+    std::atomic<bool> isNotePlayed1, isNotePlayed2, isNotePlayed3, isNotePlayed4;
 
     CustomSamplerSound* customSamplerSound1 {nullptr};
     CustomSamplerSound* customSamplerSound2 {nullptr};
     CustomSamplerSound* customSamplerSound3 {nullptr};
     CustomSamplerSound* customSamplerSound4 {nullptr};
-    CustomSamplerSound* customSamplerSound1D {nullptr};
-    CustomSamplerSound* customSamplerSound2D {nullptr};
-    CustomSamplerSound* customSamplerSound3D {nullptr};
-    CustomSamplerSound* customSamplerSound4D {nullptr};
 
     CustomSamplerVoice* voiceSynth1 {nullptr};
     CustomSamplerVoice* voiceSynth2 {nullptr};
@@ -125,15 +131,19 @@ private:
     Synthesiser varSynthesiser1, varSynthesiser2, varSynthesiser3, varSynthesiser4;
     AudioFormatManager varFormatManager;
     AudioFormatReader* varFormatReader {nullptr};
+    AudioBuffer<float> varAudioBuffer1, varAudioBuffer2, varAudioBuffer3, varAudioBuffer4;
 
     //RUBBERBAND
     std::unique_ptr<RubberBand::RubberBandStretcher> stretcherSynth1, stretcherSynth2, stretcherSynth3, stretcherSynth4;
     AudioBuffer<float> stretchBufferSynth1, stretchBufferSynth2, stretchBufferSynth3, stretchBufferSynth4; //Temporal stretch buffers
 
-    //BPM
-    AudioPlayHead* playHead;
-    AudioPlayHead::CurrentPositionInfo currentPositionInfo;
-    float stretchingRatio;
+    //VALUES TO SAVE WHEN CLOSE SESSION
+    //SOLO VALUES
+    bool sv1=false, sv2=false, sv3=false, sv4=false;
+    //COMBOBOX VALUES
+    int cbv1=0, cbv2=0, cbv3=0, cbv4=0;
+    //APVTS VALUES
+    double knob1=49.0f, knob2=0.0f, knob3=0.0f, knob4=0.0f, knob5=49.0f, knob6=1999.0f, knob7=500.0f, knob8=-5.0f;
 
     AudioProcessorValueTreeState::ParameterLayout paramLayout();
     //==============================================================================

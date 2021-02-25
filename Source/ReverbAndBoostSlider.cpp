@@ -14,7 +14,7 @@ ReverbAndBoostSlider::ReverbAndBoostSlider(Twisted_pluginAudioProcessor& p) : pr
     slider = std::make_unique<Slider>();
     
     slider->setLookAndFeel(&customSlidersLookAndFeel);
-    slider->setSliderStyle(Slider::Rotary);
+    slider->setSliderStyle(Slider::RotaryVerticalDrag);
     slider->setTextBoxStyle(Slider::TextBoxBelow, false, 50, 15);
     slider->setColour(Slider::thumbColourId, Colours::cadetblue);
     slider->setRange(0, 10, 0.1);
@@ -38,5 +38,5 @@ std::vector<std::unique_ptr<ReverbAndBoostSlider>> ReverbAndBoostSlider::createO
 }
 
 void ReverbAndBoostSlider::resized() {
-    slider->setBoundsRelative(0, 0, 1, 1);
+    slider->setBoundsRelative(0.0f, 0.0f, 1.0f, 1.0f);
 }
